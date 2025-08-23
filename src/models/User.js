@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
   entityId: {
     type: mongoose.Schema.Types.ObjectId,
     refPath: 'entityModel',
-    required: true
+    // required: true
   },
   entityModel: {
     type: String,
@@ -33,13 +33,12 @@ const userSchema = new mongoose.Schema({
   },
   walletAddress: {
     type: String,
-    required: true,
-    unique: true
+    // required: true,
+    // unique: true
   },
   transactions: [{
     hash: {
-      type: String,
-      required: true
+      type: String
     },
     timestamp: {
       type: Date,
@@ -51,7 +50,7 @@ const userSchema = new mongoose.Schema({
     }
   }],
 
-  blockchainHash: { type: String, required: true },
+  blockchainHash: { type: String },
   isActive: {
     type: Boolean,
     default: true
@@ -66,6 +65,17 @@ const userSchema = new mongoose.Schema({
   },
   lockUntil: {
     type: Date,
+    default: null
+  },
+  // Audit fields
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+
+  updatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     default: null
   },
   resetPasswordToken: String,

@@ -5,27 +5,27 @@ import { sha256OfObject } from '../utils/hash.js';
 export const register = async (req, res, next) => {
   try {
     // const { email, password, walletAddress, role, ...entityData } = req.body;
-    const { email, password, walletAddress, role, ...rest } = req.body;
+    const { email, password, ...rest } = req.body;
     const entityData = { ...rest, email };
     const blockchainHash = sha256OfObject({ ...req.body });
 
 
     // Validate required fields
-    if (!email || !password || !walletAddress || !role) {
+    if (!email || !password) {
       return res.status(400).json({
         ok: false,
-        message: 'Email, password, wallet address, and role are required'
+        message: 'Email, password are required'
       });
     }
 
     // Validate role
-    const validRoles = ['patient', 'doctor', 'hospital'];
-    if (!validRoles.includes(role)) {
-      return res.status(400).json({
-        ok: false,
-        message: 'Invalid role. Must be one of: patient, doctor, hospital'
-      });
-    }
+    // const validRoles = ['patient', 'doctor', 'hospital'];
+    // if (!validRoles.includes(role)) {
+    //   return res.status(400).json({
+    //     ok: false,
+    //     message: 'Invalid role. Must be one of: patient, doctor, hospital'
+    //   });
+    // }
 
     // Validate password strength
     if (password.length < 6) {
@@ -36,9 +36,9 @@ export const register = async (req, res, next) => {
     }
 
     const result = await AuthService.register(
-      { email, password, walletAddress },
+      { email, password },
       entityData,
-      role,
+      // role,
       blockchainHash
     );
 

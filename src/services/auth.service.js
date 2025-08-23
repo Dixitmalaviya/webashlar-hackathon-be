@@ -103,11 +103,11 @@ export class AuthService {
 
   // Register user
   static async register(userData, entityData, role, blockchainHash) {
-    const { email, password, walletAddress } = userData;
+    const { email, password} = userData;
 
     // Check if user already exists
     const existingUser = await User.findOne({
-      $or: [{ email: email.toLowerCase() }, { walletAddress }]
+      $or: [{ email: email.toLowerCase() }]
     });
 
     if (existingUser) {
@@ -118,38 +118,43 @@ export class AuthService {
     let entity;
     let entityModel;
 
-    switch (role) {
-      case 'patient':
-        entity = await Patient.create(entityData);
-        entityModel = 'Patient';
-        break;
-      case 'doctor':
-        entity = await Doctor.create(entityData);
-        entityModel = 'Doctor';
-        break;
-      case 'hospital':
-        entity = await Hospital.create(entityData);
-        entityModel = 'Hospital';
-        break;
-      default:
-        throw new Error('Invalid role');
-    }
+    entity = await Patient.create(entityData);
+    entityModel = 'Patient';
+    // switch (role) {
+    //   case 'patient':
+    //     entity = await Patient.create(entityData);
+    //     entityModel = 'Patient';
+    //     break;
+    //   case 'doctor':
+    //     entity = await Doctor.create(entityData);
+    //     entityModel = 'Doctor';
+    //     break;
+    //   case 'hospital':
+    //     entity = await Hospital.create(entityData);
+    //     entityModel = 'Hospital';
+    //     break;
+    //   default:
+    //     throw new Error('Invalid role');
+    // }
 
     // Create user account
     const user = await User.create({
       email: email.toLowerCase(),
       password,
-      role,
+      role: "patient",
       entityId: entity._id,
       entityModel,
-      walletAddress,
+      // walletAddress,
       blockchainHash,
       transactions: [{
         hash: blockchainHash,
         description: 'User registered'
-      }]
+      }],
     });
 
+    // const userdata = await User.findOne({ email: email.toLowerCase() })
+    // await User.updateOne({ email: email.toLowerCase(), createdBy: userdata._id })
+    // const userdata1 = await User.findOne({ email: email.toLowerCase() })
     // Generate token
     const token = this.generateToken(user);
 
@@ -159,11 +164,12 @@ export class AuthService {
         id: user._id,
         email: user.email,
         role: user.role,
-        walletAddress: user.walletAddress,
+        // walletAddress: user.walletAddress,
         entityId: user.entityId,
         entityDetails: entity,
         blockchainHash: blockchainHash,
-        transactions: user.transactions
+        transactions: user.transactions,
+        // createdBy: (userdata1._id).toString()
       },
       expiresIn: JWT_EXPIRES_IN
     };
