@@ -7,7 +7,7 @@ const hospitalSchema = new mongoose.Schema({
   contactNumber: { type: String, maxlength: 20 },
   email: { type: String, unique: true, maxlength: 100 },
   address: { type: String },
-  walletAddress: { type: String, unique: true },
+  walletAddress: { type: String},
   blockchainHash: { type: String, unique: true },
   sbtTokenId: { type: Number, unique: true }
 }, { timestamps: true });

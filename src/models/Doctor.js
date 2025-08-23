@@ -8,7 +8,7 @@ const doctorSchema = new mongoose.Schema({
   contactNumber: { type: String, maxlength: 20 },
   email: { type: String, unique: true, maxlength: 100 },
   hospital: { type: mongoose.Schema.Types.ObjectId, ref: 'Hospital', required: true },
-  walletAddress: { type: String, unique: true },
+  walletAddress: { type: String },
   blockchainHash: { type: String, unique: true },
   sbtTokenId: { type: Number, unique: true }
 }, { timestamps: true });

@@ -9,9 +9,9 @@ const patientSchema = new mongoose.Schema({
   email: { type: String, maxlength: 100, unique: true },
   address: { type: String },
   emergencyContact: { name: String, relation: String, phone: String },
-  walletAddress: { type: String, unique: true },
+  walletAddress: { type: String },
   blockchainHash: { type: String, unique: true },
-  sbtTokenId: { type: Number, unique: true }
+  // sbtTokenId: { type: Number, unique: true }
 }, { timestamps: true });
 
 export default mongoose.model('Patient', patientSchema);

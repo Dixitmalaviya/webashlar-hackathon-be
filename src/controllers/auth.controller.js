@@ -37,7 +37,7 @@ export const register = async (req, res, next) => {
 
     const result = await AuthService.register(
       { email, password },
-      entityData,
+      // entityData,
       // role,
       blockchainHash
     );
