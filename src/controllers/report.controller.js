@@ -20,6 +20,7 @@ export const createReport = async (req, res, next) => {
 export const getReportById = async (req, res, next) => {
   try {
     const { reportId } = req.params;
+    console.log("reportId", reportId)
 
     if (!reportId) {
       return res.status(400).json({

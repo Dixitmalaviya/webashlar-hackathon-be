@@ -5,6 +5,8 @@ import Patient from '../models/Patient.js';
 import Doctor from '../models/Doctor.js';
 import Hospital from '../models/Hospital.js';
 import { config } from '../config/mode.js';
+import { sha256OfObject } from '../utils/hash.js';
+
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
@@ -100,7 +102,7 @@ export class AuthService {
   }
 
   // Register user
-  static async register(userData, entityData, role) {
+  static async register(userData, entityData, role, blockchainHash) {
     const { email, password, walletAddress } = userData;
 
     // Check if user already exists
@@ -115,7 +117,7 @@ export class AuthService {
     // Create entity first
     let entity;
     let entityModel;
-    
+
     switch (role) {
       case 'patient':
         entity = await Patient.create(entityData);
@@ -140,7 +142,12 @@ export class AuthService {
       role,
       entityId: entity._id,
       entityModel,
-      walletAddress
+      walletAddress,
+      blockchainHash,
+      transactions: [{
+        hash: blockchainHash,
+        description: 'User registered'
+      }]
     });
 
     // Generate token
@@ -154,7 +161,9 @@ export class AuthService {
         role: user.role,
         walletAddress: user.walletAddress,
         entityId: user.entityId,
-        entityDetails: entity
+        entityDetails: entity,
+        blockchainHash: blockchainHash,
+        transactions: user.transactions
       },
       expiresIn: JWT_EXPIRES_IN
     };
@@ -318,18 +327,39 @@ export class AuthService {
       throw new Error('User not found');
     }
 
-    // Update allowed fields
+    // Define allowed fields
     const allowedUpdates = ['email'];
     const updates = {};
-    
-    allowedUpdates.forEach(field => {
-      if (updateData[field] !== undefined) {
-        updates[field] = updateData[field];
-      }
-    });
+    let profileChanged = false;
 
-    if (Object.keys(updates).length > 0) {
-      await User.findByIdAndUpdate(userId, updates);
+    for (const field of allowedUpdates) {
+      if (updateData[field] !== undefined && updateData[field] !== user[field]) {
+        updates[field] = updateData[field];
+        profileChanged = true;
+      }
+    }
+
+    if (profileChanged) {
+      // Apply updates
+      await User.findByIdAndUpdate(userId, updates, { new: true });
+
+      // Re-fetch updated user
+      const updatedUser = await User.findById(userId);
+
+      // Prepare data for hashing — only relevant public data
+      const hashData = {
+        email: updatedUser.email,
+        walletAddress: updatedUser.walletAddress,
+        role: updatedUser.role,
+        entityId: updatedUser.entityId.toString()
+      };
+
+      // Generate new blockchain hash
+      const newHash = sha256OfObject(hashData);
+
+      // Update blockchainHash and add transaction
+      updatedUser.blockchainHash = newHash;
+      await updatedUser.addTransaction(newHash, 'Profile updated');
     }
 
     return this.getCurrentUser(userId);

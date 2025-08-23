@@ -1,9 +1,14 @@
 import { AuthService } from '../services/auth.service.js';
+import { sha256OfObject } from '../utils/hash.js';
 
 // Register new user
 export const register = async (req, res, next) => {
   try {
-    const { email, password, walletAddress, role, ...entityData } = req.body;
+    // const { email, password, walletAddress, role, ...entityData } = req.body;
+    const { email, password, walletAddress, role, ...rest } = req.body;
+    const entityData = { ...rest, email };
+    const blockchainHash = sha256OfObject({ ...req.body });
+
 
     // Validate required fields
     if (!email || !password || !walletAddress || !role) {
@@ -33,7 +38,8 @@ export const register = async (req, res, next) => {
     const result = await AuthService.register(
       { email, password, walletAddress },
       entityData,
-      role
+      role,
+      blockchainHash
     );
 
     res.status(201).json({
@@ -89,7 +95,7 @@ export const getProfile = async (req, res, next) => {
 export const updateProfile = async (req, res, next) => {
   try {
     const { email } = req.body;
-    
+
     const user = await AuthService.updateProfile(req.user.id, { email });
 
     res.json({

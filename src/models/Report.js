@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import { sha256OfObject } from '../utils/hash.js';
+
 
 const reportSchema = new mongoose.Schema({
   // Basic report information
@@ -219,7 +221,6 @@ reportSchema.pre('save', function (next) {
     };
 
     // Import hash utility
-    const { sha256OfObject } = require('../utils/hash.js');
     this.blockchainHash = sha256OfObject(dataToHash);
   }
   next();
