@@ -1,0 +1,1703 @@
+{
+	"info": {
+		"_postman_id": "healthcare-chain-api-collection",
+		"name": "Healthcare Chain API",
+		"description": "Complete collection for testing the Healthcare Chain API with blockchain bypass feature",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register Patient",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\",\n  \"walletAddress\": \"0x1234567890123456789012345678901234567890\",\n  \"role\": \"patient\",\n  \"fullName\": \"John Doe\",\n  \"dob\": \"1990-01-01\",\n  \"phone\": \"+1234567890\",\n  \"address\": \"123 Main St, City, State 12345\",\n  \"emergencyContact\": {\n    \"name\": \"Jane Doe\",\n    \"phone\": \"+1234567891\",\n    \"relationship\": \"Spouse\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "register"]
+						},
+						"description": "Register a new patient with authentication"
+					},
+					"response": []
+				},
+				{
+					"name": "Register Doctor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"dr.sarah@hospital.com\",\n  \"password\": \"password123\",\n  \"walletAddress\": \"0x0987654321098765432109876543210987654321\",\n  \"role\": \"doctor\",\n  \"fullName\": \"Dr. Sarah Smith\",\n  \"licenseNumber\": \"MD123456\",\n  \"phone\": \"+1234567892\",\n  \"specialization\": \"Cardiology\",\n  \"hospital\": \"{{hospital_id}}\",\n  \"yearsOfExperience\": 10\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "register"]
+						},
+						"description": "Register a new doctor with authentication"
+					},
+					"response": []
+				},
+				{
+					"name": "Register Hospital",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@cityhospital.com\",\n  \"password\": \"password123\",\n  \"walletAddress\": \"0x1111111111111111111111111111111111111111\",\n  \"role\": \"hospital\",\n  \"name\": \"City General Hospital\",\n  \"registrationNumber\": \"HOSP001\",\n  \"phone\": \"+1234567893\",\n  \"address\": \"456 Hospital Ave, City, State 12345\",\n  \"type\": \"General\",\n  \"capacity\": 500\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "register"]
+						},
+						"description": "Register a new hospital with authentication"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "Login with email and password"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "profile"]
+						},
+						"description": "Get current user profile (requires authentication)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newemail@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "profile"]
+						},
+						"description": "Update user profile (requires authentication)"
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentPassword\": \"password123\",\n  \"newPassword\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/change-password",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "change-password"]
+						},
+						"description": "Change user password (requires authentication)"
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john.doe@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/forgot-password",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "forgot-password"]
+						},
+						"description": "Request password reset"
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"{{reset_token}}\",\n  \"newPassword\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/reset-password",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "reset-password"]
+						},
+						"description": "Reset password with token"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/refresh-token",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "refresh-token"]
+						},
+						"description": "Refresh authentication token"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "logout"]
+						},
+						"description": "Logout user"
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/verify-token",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "verify-token"]
+						},
+						"description": "Verify if token is valid"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Status Endpoints",
+			"item": [
+				{
+					"name": "Get System Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/status/status",
+							"host": ["{{base_url}}"],
+							"path": ["api", "status", "status"]
+						},
+						"description": "Get the current system status and blockchain configuration"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Blockchain Config",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/status/blockchain-config",
+							"host": ["{{base_url}}"],
+							"path": ["api", "status", "blockchain-config"]
+						},
+						"description": "Get detailed blockchain configuration status"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Identity Management",
+			"item": [
+				{
+					"name": "Register Patient",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-private-key",
+								"value": "{{user_private_key}}",
+								"description": "Required for blockchain mode only"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"John Doe\",\n  \"dob\": \"1990-01-01\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"+1234567890\",\n  \"address\": \"123 Main St, City, State 12345\",\n  \"walletAddress\": \"0x1234567890123456789012345678901234567890\",\n  \"emergencyContact\": {\n    \"name\": \"Jane Doe\",\n    \"phone\": \"+1234567891\",\n    \"relationship\": \"Spouse\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/identity/patient/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "identity", "patient", "register"]
+						},
+						"description": "Register a new patient. In blockchain mode, requires x-user-private-key header."
+					},
+					"response": []
+				},
+				{
+					"name": "Register Doctor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-private-key",
+								"value": "{{user_private_key}}",
+								"description": "Required for blockchain mode only"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Dr. Sarah Smith\",\n  \"licenseNumber\": \"MD123456\",\n  \"email\": \"sarah.smith@hospital.com\",\n  \"phone\": \"+1234567892\",\n  \"specialization\": \"Cardiology\",\n  \"hospital\": \"{{hospital_id}}\",\n  \"walletAddress\": \"0x0987654321098765432109876543210987654321\",\n  \"yearsOfExperience\": 10\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/identity/doctor/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "identity", "doctor", "register"]
+						},
+						"description": "Register a new doctor. In blockchain mode, requires x-user-private-key header."
+					},
+					"response": []
+				},
+				{
+					"name": "Register Hospital",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-private-key",
+								"value": "{{user_private_key}}",
+								"description": "Required for blockchain mode only"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"City General Hospital\",\n  \"registrationNumber\": \"HOSP001\",\n  \"email\": \"admin@cityhospital.com\",\n  \"phone\": \"+1234567893\",\n  \"address\": \"456 Hospital Ave, City, State 12345\",\n  \"walletAddress\": \"0x1111111111111111111111111111111111111111\",\n  \"type\": \"General\",\n  \"capacity\": 500\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/identity/hospital/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "identity", "hospital", "register"]
+						},
+						"description": "Register a new hospital. In blockchain mode, requires x-user-private-key header."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Patient by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/identity/patient/{{patient_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "identity", "patient", "{{patient_id}}"]
+						},
+						"description": "Get patient details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Doctor by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/identity/doctor/{{doctor_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "identity", "doctor", "{{doctor_id}}"]
+						},
+						"description": "Get doctor details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Hospital by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/identity/hospital/{{hospital_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "identity", "hospital", "{{hospital_id}}"]
+						},
+						"description": "Get hospital details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Patients",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/identity/patients",
+							"host": ["{{base_url}}"],
+							"path": ["api", "identity", "patients"]
+						},
+						"description": "Get list of all patients"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Doctors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/identity/doctors",
+							"host": ["{{base_url}}"],
+							"path": ["api", "identity", "doctors"]
+						},
+						"description": "Get list of all doctors"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Hospitals",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/identity/hospitals",
+							"host": ["{{base_url}}"],
+							"path": ["api", "identity", "hospitals"]
+						},
+						"description": "Get list of all hospitals"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Consent Management",
+			"item": [
+				{
+					"name": "Grant Consent",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-private-key",
+								"value": "{{user_private_key}}",
+								"description": "Required for blockchain mode only"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientAddress\": \"0x1234567890123456789012345678901234567890\",\n  \"granteeAddress\": \"0x0987654321098765432109876543210987654321\",\n  \"scope\": \"medical_records\",\n  \"durationDays\": 30\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/consent/grant",
+							"host": ["{{base_url}}"],
+							"path": ["api", "consent", "grant"]
+						},
+						"description": "Grant consent for data access. In blockchain mode, requires x-user-private-key header."
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke Consent",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-private-key",
+								"value": "{{user_private_key}}",
+								"description": "Required for blockchain mode only"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientAddress\": \"0x1234567890123456789012345678901234567890\",\n  \"granteeAddress\": \"0x0987654321098765432109876543210987654321\",\n  \"scope\": \"medical_records\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/consent/revoke",
+							"host": ["{{base_url}}"],
+							"path": ["api", "consent", "revoke"]
+						},
+						"description": "Revoke consent for data access. In blockchain mode, requires x-user-private-key header."
+					},
+					"response": []
+				},
+				{
+					"name": "Check Consent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/consent/check?patientAddress=0x1234567890123456789012345678901234567890&requesterAddress=0x0987654321098765432109876543210987654321&scope=medical_records",
+							"host": ["{{base_url}}"],
+							"path": ["api", "consent", "check"],
+							"query": [
+								{
+									"key": "patientAddress",
+									"value": "0x1234567890123456789012345678901234567890"
+								},
+								{
+									"key": "requesterAddress",
+									"value": "0x0987654321098765432109876543210987654321"
+								},
+								{
+									"key": "scope",
+									"value": "medical_records"
+								}
+							]
+						},
+						"description": "Check if consent is granted for specific access"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Consent Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/consent/status?patientAddress=0x1234567890123456789012345678901234567890&requesterAddress=0x0987654321098765432109876543210987654321&scope=medical_records",
+							"host": ["{{base_url}}"],
+							"path": ["api", "consent", "status"],
+							"query": [
+								{
+									"key": "patientAddress",
+									"value": "0x1234567890123456789012345678901234567890"
+								},
+								{
+									"key": "requesterAddress",
+									"value": "0x0987654321098765432109876543210987654321"
+								},
+								{
+									"key": "scope",
+									"value": "medical_records"
+								}
+							]
+						},
+						"description": "Get detailed consent status information"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Consents for Patient",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/consent/patient/0x1234567890123456789012345678901234567890",
+							"host": ["{{base_url}}"],
+							"path": ["api", "consent", "patient", "0x1234567890123456789012345678901234567890"]
+						},
+						"description": "Get all consents for a specific patient"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Medical Records",
+			"item": [
+				{
+					"name": "Create Medical Record",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient\": \"{{patient_id}}\",\n  \"doctor\": \"{{doctor_id}}\",\n  \"hospital\": \"{{hospital_id}}\",\n  \"diagnosis\": \"Hypertension\",\n  \"treatment\": \"Lifestyle modifications and medication\",\n  \"prescription\": \"Lisinopril 10mg daily\",\n  \"notes\": \"Patient shows improvement with current treatment plan\",\n  \"consentScope\": \"general\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/records/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "records", ""]
+						},
+						"description": "Create a new medical record"
+					},
+					"response": []
+				},
+				{
+					"name": "Attach Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"recordId\": \"{{record_id}}\",\n  \"reportType\": \"blood_test\",\n  \"reportFileUrl\": \"https://example.com/reports/blood_test_123.pdf\",\n  \"reportData\": {\n    \"hemoglobin\": \"14.2 g/dL\",\n    \"white_blood_cells\": \"7.5 K/μL\",\n    \"platelets\": \"250 K/μL\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/records/report",
+							"host": ["{{base_url}}"],
+							"path": ["api", "records", "report"]
+						},
+						"description": "Attach a report to an existing medical record"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Records",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/records/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "records", ""]
+						},
+						"description": "Get all medical records"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Record by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/records/{{record_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "records", "{{record_id}}"]
+						},
+						"description": "Get a specific medical record by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Records by Patient",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/records/patient/{{patient_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "records", "patient", "{{patient_id}}"]
+						},
+						"description": "Get all medical records for a specific patient"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Records by Doctor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/records/doctor/{{doctor_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "records", "doctor", "{{doctor_id}}"]
+						},
+						"description": "Get all medical records created by a specific doctor"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Records by Hospital",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/records/hospital/{{hospital_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "records", "hospital", "{{hospital_id}}"]
+						},
+						"description": "Get all medical records from a specific hospital"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Record",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"diagnosis\": \"Hypertension - Stage 1\",\n  \"treatment\": \"Lisinopril 10mg daily, diet and exercise\",\n  \"notes\": \"Patient shows significant improvement. Continue current treatment.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/records/{{record_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "records", "{{record_id}}"]
+						},
+						"description": "Update an existing medical record"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Record",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/records/{{record_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "records", "{{record_id}}"]
+						},
+						"description": "Delete a medical record"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Medical Reports",
+			"item": [
+				{
+					"name": "Create Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "x-user-private-key",
+								"value": "{{user_private_key}}",
+								"description": "Required for blockchain mode only"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"doctorId\": \"{{doctor_id}}\",\n  \"hospitalId\": \"{{hospital_id}}\",\n  \"reportType\": \"blood_test\",\n  \"title\": \"Complete Blood Count\",\n  \"description\": \"Routine blood test for health checkup\",\n  \"testDate\": \"2024-01-15\",\n  \"reportData\": {\n    \"hemoglobin\": \"14.2 g/dL\",\n    \"white_blood_cells\": \"7.5 K/μL\",\n    \"platelets\": \"250 K/μL\",\n    \"red_blood_cells\": \"4.8 M/μL\"\n  },\n  \"results\": {\n    \"hemoglobin\": {\n      \"value\": \"14.2\",\n      \"unit\": \"g/dL\",\n      \"normal_range\": \"12.0-15.5\",\n      \"status\": \"normal\"\n    },\n    \"white_blood_cells\": {\n      \"value\": \"7.5\",\n      \"unit\": \"K/μL\",\n      \"normal_range\": \"4.5-11.0\",\n      \"status\": \"normal\"\n    }\n  },\n  \"findings\": \"All parameters within normal range\",\n  \"recommendations\": \"Continue with regular health monitoring\",\n  \"isCritical\": false,\n  \"accessLevel\": \"patient\",\n  \"tags\": [\"routine\", \"blood_test\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reports",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports"]
+						},
+						"description": "Create a new medical report (requires doctor/admin role)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Report by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/{{report_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "{{report_id}}"]
+						},
+						"description": "Get a specific report by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Reports",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports?page=1&limit=10&reportType=blood_test&status=completed",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "reportType",
+									"value": "blood_test"
+								},
+								{
+									"key": "status",
+									"value": "completed"
+								}
+							]
+						},
+						"description": "Get all reports with filtering and pagination"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Report",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "x-user-private-key",
+								"value": "{{user_private_key}}",
+								"description": "Required for blockchain mode only"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Complete Blood Count\",\n  \"findings\": \"Updated findings with additional analysis\",\n  \"recommendations\": \"Follow up in 3 months\",\n  \"status\": \"reviewed\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reports/{{report_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "{{report_id}}"]
+						},
+						"description": "Update an existing report (requires doctor/admin role)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Report",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "x-user-private-key",
+								"value": "{{user_private_key}}",
+								"description": "Required for blockchain mode only"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/{{report_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "{{report_id}}"]
+						},
+						"description": "Delete a report (requires admin role)"
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Report as Reviewed",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"reviewNotes\": \"Report reviewed and findings confirmed\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reports/{{report_id}}/review",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "{{report_id}}", "review"]
+						},
+						"description": "Mark a report as reviewed (requires doctor role)"
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Report as Critical",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"criticalValues\": [\n    {\n      \"parameter\": \"hemoglobin\",\n      \"value\": \"8.5\",\n      \"normalRange\": \"12.0-15.5\",\n      \"unit\": \"g/dL\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reports/{{report_id}}/critical",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "{{report_id}}", "critical"]
+						},
+						"description": "Mark a report as critical (requires doctor role)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reports by Patient",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/patient/{{patient_id}}?status=completed&reportType=blood_test",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "patient", "{{patient_id}}"],
+							"query": [
+								{
+									"key": "status",
+									"value": "completed"
+								},
+								{
+									"key": "reportType",
+									"value": "blood_test"
+								}
+							]
+						},
+						"description": "Get all reports for a specific patient"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reports by Doctor",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/doctor/{{doctor_id}}?status=completed",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "doctor", "{{doctor_id}}"],
+							"query": [
+								{
+									"key": "status",
+									"value": "completed"
+								}
+							]
+						},
+						"description": "Get all reports created by a specific doctor"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reports by Hospital",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/hospital/{{hospital_id}}?page=1&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "hospital", "{{hospital_id}}"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get all reports from a specific hospital"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Critical Reports",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/critical/all?hospitalId={{hospital_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "critical", "all"],
+							"query": [
+								{
+									"key": "hospitalId",
+									"value": "{{hospital_id}}"
+								}
+							]
+						},
+						"description": "Get all critical reports"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Report Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/stats/all?startDate=2024-01-01&endDate=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "stats", "all"],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Get report statistics"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Reports",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/search?q=blood&reportType=blood_test&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "search"],
+							"query": [
+								{
+									"key": "q",
+									"value": "blood"
+								},
+								{
+									"key": "reportType",
+									"value": "blood_test"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Search reports by keyword"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Reports",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/my-reports?page=1&limit=10&status=completed",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "my-reports"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "completed"
+								}
+							]
+						},
+						"description": "Get reports for the current user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Report Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/my-stats",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "my-stats"]
+						},
+						"description": "Get report statistics for the current user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Report Types",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/types",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "types"]
+						},
+						"description": "Get available report types"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Report Statuses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/statuses",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "statuses"]
+						},
+						"description": "Get available report statuses"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Access Levels",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/access-levels",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "access-levels"]
+						},
+						"description": "Get available access levels"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Report File",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/{{report_id}}/upload",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "{{report_id}}", "upload"]
+						},
+						"description": "Upload a file for a report (requires doctor/admin role)"
+					},
+					"response": []
+				},
+				{
+					"name": "Download Report File",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/{{report_id}}/download",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "{{report_id}}", "download"]
+						},
+						"description": "Download a report file"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Patient-Doctor Relationships",
+			"item": [
+				{
+					"name": "Create Relationship",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "x-user-private-key",
+								"value": "{{user_private_key}}",
+								"description": "Required for blockchain mode only"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"doctorId\": \"{{doctor_id}}\",\n  \"hospitalId\": \"{{hospital_id}}\",\n  \"relationshipType\": \"primary_care\",\n  \"notes\": \"Patient assigned to primary care physician\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/relationships",
+							"host": ["{{base_url}}"],
+							"path": ["api", "relationships"]
+						},
+						"description": "Create a patient-doctor relationship (requires admin/hospital role)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Doctors (Patient)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/relationships/my-doctors",
+							"host": ["{{base_url}}"],
+							"path": ["api", "relationships", "my-doctors"]
+						},
+						"description": "Get all doctors for the logged-in patient"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Patients (Doctor)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/relationships/my-patients",
+							"host": ["{{base_url}}"],
+							"path": ["api", "relationships", "my-patients"]
+						},
+						"description": "Get all patients for the logged-in doctor"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Doctor Data (Patient)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/relationships/my-doctor/{{doctor_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "relationships", "my-doctor", "{{doctor_id}}"]
+						},
+						"description": "Get comprehensive doctor data including records and reports"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Patient Data (Doctor)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/relationships/my-patient/{{patient_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "relationships", "my-patient", "{{patient_id}}"]
+						},
+						"description": "Get comprehensive patient data including records and reports"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Relationship Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/relationships/stats",
+							"host": ["{{base_url}}"],
+							"path": ["api", "relationships", "stats"]
+						},
+						"description": "Get relationship statistics for current user"
+					},
+					"response": []
+				},
+				{
+					"name": "End Relationship",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "x-user-private-key",
+								"value": "{{user_private_key}}",
+								"description": "Required for blockchain mode only"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/relationships/{{relationship_id}}/end",
+							"host": ["{{base_url}}"],
+							"path": ["api", "relationships", "{{relationship_id}}", "end"]
+						},
+						"description": "End a patient-doctor relationship"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Relationship Notes",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"notes\": \"Updated relationship notes\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/relationships/{{relationship_id}}/notes",
+							"host": ["{{base_url}}"],
+							"path": ["api", "relationships", "{{relationship_id}}", "notes"]
+						},
+						"description": "Update notes for a relationship"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Hospital Relationships",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/relationships/hospital/relationships",
+							"host": ["{{base_url}}"],
+							"path": ["api", "relationships", "hospital", "relationships"]
+						},
+						"description": "Get all relationships for the logged-in hospital"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Hospital Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/relationships/hospital/stats",
+							"host": ["{{base_url}}"],
+							"path": ["api", "relationships", "hospital", "stats"]
+						},
+						"description": "Get relationship statistics for the logged-in hospital"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Incentives",
+			"item": [
+				{
+					"name": "Process Payout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientAddress\": \"0x1234567890123456789012345678901234567890\",\n  \"ruleId\": \"regular_checkup\",\n  \"amount\": 100\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/incentives/payout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "incentives", "payout"]
+						},
+						"description": "Process an incentive payout. In blockchain mode, requires hospital signer configuration."
+					},
+					"response": []
+				},
+				{
+					"name": "Simulate Payout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientAddress\": \"0x1234567890123456789012345678901234567890\",\n  \"ruleId\": \"regular_checkup\",\n  \"amount\": 100\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/incentives/simulate",
+							"host": ["{{base_url}}"],
+							"path": ["api", "incentives", "simulate"]
+						},
+						"description": "Simulate an incentive payout without actually processing it"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payout History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/incentives/history/0x1234567890123456789012345678901234567890",
+							"host": ["{{base_url}}"],
+							"path": ["api", "incentives", "history", "0x1234567890123456789012345678901234567890"]
+						},
+						"description": "Get payout history for a specific patient"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Payouts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/incentives/all",
+							"host": ["{{base_url}}"],
+							"path": ["api", "incentives", "all"]
+						},
+						"description": "Get all payouts in the system"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payout Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/incentives/status?patientAddress=0x1234567890123456789012345678901234567890&ruleId=regular_checkup",
+							"host": ["{{base_url}}"],
+							"path": ["api", "incentives", "status"],
+							"query": [
+								{
+									"key": "patientAddress",
+									"value": "0x1234567890123456789012345678901234567890"
+								},
+								{
+									"key": "ruleId",
+									"value": "regular_checkup"
+								}
+							]
+						},
+						"description": "Check if a payout has been processed for a specific rule"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3333",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string",
+			"description": "JWT token from login response"
+		},
+		{
+			"key": "reset_token",
+			"value": "",
+			"type": "string",
+			"description": "Reset token from forgot password response"
+		},
+		{
+			"key": "user_private_key",
+			"value": "0x1234567890123456789012345678901234567890123456789012345678901234",
+			"type": "string",
+			"description": "Private key for blockchain transactions (DEV ONLY)"
+		},
+		{
+			"key": "patient_id",
+			"value": "507f1f77bcf86cd799439011",
+			"type": "string",
+			"description": "Patient ID from registration response"
+		},
+		{
+			"key": "doctor_id",
+			"value": "507f1f77bcf86cd799439012",
+			"type": "string",
+			"description": "Doctor ID from registration response"
+		},
+		{
+			"key": "hospital_id",
+			"value": "507f1f77bcf86cd799439013",
+			"type": "string",
+			"description": "Hospital ID from registration response"
+		},
+		{
+			"key": "record_id",
+			"value": "507f1f77bcf86cd799439014",
+			"type": "string",
+			"description": "Record ID from create record response"
+		},
+		{
+			"key": "relationship_id",
+			"value": "507f1f77bcf86cd799439015",
+			"type": "string",
+			"description": "Relationship ID from create relationship response"
+		},
+		{
+			"key": "report_id",
+			"value": "507f1f77bcf86cd799439016",
+			"type": "string",
+			"description": "Report ID from create report response"
+		}
+	]
+}
