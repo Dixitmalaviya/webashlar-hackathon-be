@@ -6,7 +6,7 @@ const reportSchema = new mongoose.Schema({
   // Basic report information
   reportType: {
     type: String,
-    required: true,
+    // required: true,
     enum: [
       'blood_test',
       'urine_test',
@@ -30,7 +30,7 @@ const reportSchema = new mongoose.Schema({
   // Report title and description
   title: {
     type: String,
-    required: true,
+    // required: true,
     trim: true
   },
 
@@ -43,19 +43,19 @@ const reportSchema = new mongoose.Schema({
   patient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Patient',
-    required: true
+    // required: true
   },
 
   doctor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Doctor',
-    required: true
+    // required: true
   },
 
   hospital: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Hospital',
-    required: true
+    // required: true
   },
 
   // Link to medical record (optional)
@@ -81,6 +81,11 @@ const reportSchema = new mongoose.Schema({
     default: null
   },
 
+  reportName: {
+    type: String,
+    default: null
+  },
+
   // Report status and dates
   status: {
     type: String,
@@ -90,7 +95,7 @@ const reportSchema = new mongoose.Schema({
 
   testDate: {
     type: Date,
-    required: true
+    // required: true
   },
 
   reportDate: {
@@ -150,16 +155,16 @@ const reportSchema = new mongoose.Schema({
     default: 'private'
   },
 
-  // Blockchain integration
-  blockchainHash: {
-    type: String,
-    default: null
-  },
+  // // Blockchain integration
+  // blockchainHash: {
+  //   type: String,
+  //   default: null
+  // },
 
-  blockchainTxHash: {
-    type: String,
-    default: null
-  },
+  // blockchainTxHash: {
+  //   type: String,
+  //   default: null
+  // },
 
   // Metadata
   tags: [{
@@ -175,8 +180,7 @@ const reportSchema = new mongoose.Schema({
   // Audit fields
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
   },
 
   updatedBy: {

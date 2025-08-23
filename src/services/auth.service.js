@@ -17,9 +17,9 @@ export class AuthService {
     const payload = {
       id: user._id,
       email: user.email,
-      role: user.role,
-      entityId: user.entityId,
-      walletAddress: user.walletAddress
+      // role: user.role,
+      // entityId: user.entityId,
+      // walletAddress: user.walletAddress
     };
 
     return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
@@ -93,7 +93,7 @@ export class AuthService {
         id: user._id,
         email: user.email,
         role: user.role,
-        walletAddress: user.walletAddress,
+        // walletAddress: user.walletAddress,
         entityId: user.entityId,
         entityDetails
       },
@@ -103,23 +103,24 @@ export class AuthService {
 
   // Register user
   static async register(userData, entityData, role, blockchainHash) {
-    const { email, password} = userData;
-
+    const { email, password } = userData;
+    console.log("userdarta", userData)
     // Check if user already exists
     const existingUser = await User.findOne({
       $or: [{ email: email.toLowerCase() }]
     });
+
+    console.log("existingUser", existingUser)
 
     if (existingUser) {
       throw new Error('User with this email or wallet address already exists');
     }
 
     // Create entity first
-    let entity;
-    let entityModel;
+    // let entity;
+    // let entityModel;
 
-    entity = await Patient.create(entityData);
-    entityModel = 'Patient';
+
     // switch (role) {
     //   case 'patient':
     //     entity = await Patient.create(entityData);
@@ -142,8 +143,8 @@ export class AuthService {
       email: email.toLowerCase(),
       password,
       role: "patient",
-      entityId: entity._id,
-      entityModel,
+      // entityId: entity._id,
+      // entityModel,
       // walletAddress,
       blockchainHash,
       transactions: [{
@@ -151,6 +152,11 @@ export class AuthService {
         description: 'User registered'
       }],
     });
+
+    console.log("user", user)
+
+    // entity = await Patient.create(entityData);
+    // entityModel = 'Patient';
 
     // const userdata = await User.findOne({ email: email.toLowerCase() })
     // await User.updateOne({ email: email.toLowerCase(), createdBy: userdata._id })
@@ -165,8 +171,8 @@ export class AuthService {
         email: user.email,
         role: user.role,
         // walletAddress: user.walletAddress,
-        entityId: user.entityId,
-        entityDetails: entity,
+        // entityId: user.entityId,
+        // entityDetails: entity,
         blockchainHash: blockchainHash,
         transactions: user.transactions,
         // createdBy: (userdata1._id).toString()

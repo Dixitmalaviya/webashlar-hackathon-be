@@ -1,4 +1,9 @@
 import { ReportService } from '../services/report.service.js';
+import axios from 'axios';
+import FormData from 'form-data';
+import fs from 'fs';
+import Report from '../models/Report.js';
+
 
 // Create a new medical report
 export const createReport = async (req, res, next) => {
@@ -442,16 +447,65 @@ export const getAccessLevels = async (req, res, next) => {
 // Upload report file (placeholder for file upload functionality)
 export const uploadReportFile = async (req, res, next) => {
   try {
-    // This would integrate with file upload service
-    // For now, return a placeholder response
+    // const patientId = req.body.patient_id;
+    const patientId = "68a9a1af1b4ef997a1d97fb1";
+    const reportName = req.body.reportName;
+    const file = req.file;
+
+    if (!file || !patientId || !reportName) {
+      return res.status(400).json({ ok: false, message: 'File or or reportName patient_id missing' });
+    }
+
+    // Prepare form-data for the 3rd party API
+    const form = new FormData();
+    form.append('patient_id', patientId);
+    form.append('files', fs.createReadStream(file.path), file.originalname);
+
+    // Send to external API
+    const uploadResponse = await axios.post(
+      'https://webashalarforml-health-dac-assist.hf.space/upload_reports',
+      form,
+      {
+        headers: {
+          ...form.getHeaders(),
+          'accept': '*/*',
+          'origin': 'https://webashalarforml-health-dac-assist.hf.space',
+          'referer': 'https://webashalarforml-health-dac-assist.hf.space/',
+          'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36'
+        }
+      }
+    );
+    console.log("uploadResponse", uploadResponse)
+    // Step 2: Extract uploaded file info from response
+    const uploadedFileUrl = uploadResponse.data?.patient_folder || null;
+    const uploadedFileName = file.originalname;
+
+    // Step 3: Save partial report in DB
+    const newReport = await Report.create({
+      // reportType,
+      // title,
+      // patient,
+      // doctor,
+      // hospital,
+      // testDate: new Date(testDate),
+      // createdBy,
+      reportFileUrl: uploadedFileUrl,
+      reportFileName: uploadedFileName,
+      reportName: reportName
+    });
+
+    // Clean up local file
+    fs.unlink(file.path, err => {
+      if (err) console.error('Failed to delete local file:', err);
+    });
+
+    // Send response back to frontend
     res.json({
       ok: true,
-      message: 'File upload endpoint - implement file upload service',
-      data: {
-        fileUrl: 'https://example.com/reports/uploaded_file.pdf',
-        fileName: 'uploaded_file.pdf'
-      }
+      message: 'File uploaded and forwarded successfully',
+      data: { ...uploadResponse.data, newReport }
     });
+
   } catch (error) {
     next(error);
   }
