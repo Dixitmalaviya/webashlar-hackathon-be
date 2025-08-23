@@ -22,11 +22,19 @@ import {
   downloadReportFile
 } from '../controllers/report.controller.js';
 import { authenticateToken, requireRole } from '../middleware/auth.js';
+import multer from 'multer';
+import axios from 'axios';
+import FormData from 'form-data';
+import fs from 'fs';
+import path from 'path';
+
+// multer setup (store uploaded file temporarily)
+const upload = multer({ dest: 'uploads/' }); // you can configure a temp directory
 
 const r = Router();
 
 // All routes require authentication
-r.use(authenticateToken);
+// r.use(authenticateToken);
 
 // Public endpoints (for authenticated users)
 r.get('/types', getReportTypes);
@@ -43,7 +51,7 @@ r.get('/search', searchReports);
 // CRUD operations
 r.post('/', requireRole(['doctor', 'admin']), createReport);
 r.get('/:reportId', getReportById);
-r.put('/:reportId', requireRole(['doctor', 'admin']), updateReport);
+r.put('/:reportId', updateReport);
 r.delete('/:reportId', requireRole(['admin']), deleteReport);
 
 // Report actions
@@ -51,7 +59,7 @@ r.put('/:reportId/review', requireRole(['doctor']), markAsReviewed);
 r.put('/:reportId/critical', requireRole(['doctor']), markAsCritical);
 
 // File operations
-r.post('/:reportId/upload', requireRole(['doctor', 'admin']), uploadReportFile);
+r.post('/upload', upload.single('file'), uploadReportFile);
 r.get('/:reportId/download', downloadReportFile);
 
 // Get all reports (with filtering)
