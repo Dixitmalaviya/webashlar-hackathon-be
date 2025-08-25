@@ -5,9 +5,9 @@ export const registerPatient = async (req, res, next) => {
   try {
     const payload = req.body;
     const result = await IdentityService.registerPatient(payload, req);
-    res.json({ 
-      ok: true, 
-      patient: result.patient, 
+    res.json({
+      ok: true,
+      patient: result.patient,
       txHash: result.txHash,
       blockchainEnabled: config.features.identity.blockchain
     });
@@ -17,10 +17,11 @@ export const registerPatient = async (req, res, next) => {
 export const registerDoctor = async (req, res, next) => {
   try {
     const payload = req.body;
+    console.log("Payload Register Doctor", payload)
     const result = await IdentityService.registerDoctor(payload, req);
-    res.json({ 
-      ok: true, 
-      doctor: result.doctor, 
+    res.json({
+      ok: true,
+      doctor: result.doctor,
       txHash: result.txHash,
       blockchainEnabled: config.features.identity.blockchain
     });
@@ -31,9 +32,9 @@ export const registerHospital = async (req, res, next) => {
   try {
     const payload = req.body;
     const result = await IdentityService.registerHospital(payload, req);
-    res.json({ 
-      ok: true, 
-      hospital: result.hospital, 
+    res.json({
+      ok: true,
+      hospital: result.hospital,
       txHash: result.txHash,
       blockchainEnabled: config.features.identity.blockchain
     });

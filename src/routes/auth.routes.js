@@ -10,7 +10,10 @@ import {
   refreshToken,
   logout,
   getUserByWallet,
-  verifyToken
+  verifyToken,
+  handlePatientMessage,
+  reportAnalyseData,
+  getChatHistory
 } from '../controllers/auth.controller.js';
 import { authenticateToken, requireRole } from '../middleware/auth.js';
 
@@ -29,6 +32,10 @@ r.put('/profile', authenticateToken, updateProfile);
 r.post('/change-password', authenticateToken, changePassword);
 r.post('/refresh-token', authenticateToken, refreshToken);
 r.post('/logout', authenticateToken, logout);
+
+r.post('/chat', authenticateToken, handlePatientMessage);
+r.get('/chat-history/:patientId', authenticateToken, getChatHistory);
+r.post('/analyse-report', authenticateToken, reportAnalyseData);
 
 // Admin routes
 r.get('/user/wallet/:walletAddress', authenticateToken, requireRole('admin'), getUserByWallet);

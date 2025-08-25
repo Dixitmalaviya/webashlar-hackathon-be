@@ -42,15 +42,15 @@ export class AuthService {
       throw new Error('Invalid email or password');
     }
 
-    // Check if account is locked
-    if (user.isLocked()) {
-      throw new Error('Account is temporarily locked due to multiple failed login attempts');
-    }
+    // // Check if account is locked
+    // if (user.isLocked()) {
+    //   throw new Error('Account is temporarily locked due to multiple failed login attempts');
+    // }
 
-    // Check if account is active
-    if (!user.isActive) {
-      throw new Error('Account is deactivated');
-    }
+    // // Check if account is active
+    // if (!user.isActive) {
+    //   throw new Error('Account is deactivated');
+    // }
 
     // Verify password
     const isPasswordValid = await user.comparePassword(password);
@@ -117,34 +117,34 @@ export class AuthService {
     }
 
     // Create entity first
-    // let entity;
-    // let entityModel;
+    let entity;
+    let entityModel;
 
 
-    // switch (role) {
-    //   case 'patient':
-    //     entity = await Patient.create(entityData);
-    //     entityModel = 'Patient';
-    //     break;
-    //   case 'doctor':
-    //     entity = await Doctor.create(entityData);
-    //     entityModel = 'Doctor';
-    //     break;
-    //   case 'hospital':
-    //     entity = await Hospital.create(entityData);
-    //     entityModel = 'Hospital';
-    //     break;
-    //   default:
-    //     throw new Error('Invalid role');
-    // }
+    switch (role) {
+      case 'patient':
+        entity = await Patient.create({ ...userData, ...entityData });
+        entityModel = 'Patient';
+        break;
+      case 'doctor':
+        entity = await Doctor.create({ ...userData, ...entityData });
+        entityModel = 'Doctor';
+        break;
+      case 'hospital':
+        entity = await Hospital.create({ ...userData, ...entityData });
+        entityModel = 'Hospital';
+        break;
+      default:
+        throw new Error('Invalid role');
+    }
 
     // Create user account
     const user = await User.create({
       email: email.toLowerCase(),
       password,
-      role: "patient",
-      // entityId: entity._id,
-      // entityModel,
+      role: role,
+      entityId: entity._id,
+      entityModel,
       // walletAddress,
       blockchainHash,
       transactions: [{
@@ -153,14 +153,20 @@ export class AuthService {
       }],
     });
 
+
+
     console.log("user", user)
 
     // entity = await Patient.create(entityData);
     // entityModel = 'Patient';
 
-    // const userdata = await User.findOne({ email: email.toLowerCase() })
-    // await User.updateOne({ email: email.toLowerCase(), createdBy: userdata._id })
-    // const userdata1 = await User.findOne({ email: email.toLowerCase() })
+    const userdata = await User.findOneAndUpdate(
+      { email: email.toLowerCase() },
+      { createdBy: user._id.toString() },
+      { new: true }
+    )
+    console.log("Updated user:", userdata)
+    
     // Generate token
     const token = this.generateToken(user);
 
@@ -171,11 +177,11 @@ export class AuthService {
         email: user.email,
         role: user.role,
         // walletAddress: user.walletAddress,
-        // entityId: user.entityId,
-        // entityDetails: entity,
+        entityId: user.entityId,
+        entityDetails: entity,
         blockchainHash: blockchainHash,
         transactions: user.transactions,
-        // createdBy: (userdata1._id).toString()
+        createdBy: (userdata._id).toString()
       },
       expiresIn: JWT_EXPIRES_IN
     };

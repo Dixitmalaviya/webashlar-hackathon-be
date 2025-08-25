@@ -447,8 +447,8 @@ export const getAccessLevels = async (req, res, next) => {
 // Upload report file (placeholder for file upload functionality)
 export const uploadReportFile = async (req, res, next) => {
   try {
-    // const patientId = req.body.patient_id;
-    const patientId = "68a9a1af1b4ef997a1d97fb1";
+    const patientId = req.body.patient_id;
+    // const patientId = "68a9a1af1b4ef997a1d97fb1";
     const reportName = req.body.reportName;
     const file = req.file;
 
@@ -484,7 +484,7 @@ export const uploadReportFile = async (req, res, next) => {
     const newReport = await Report.create({
       // reportType,
       // title,
-      // patient,
+      patient: patientId,
       // doctor,
       // hospital,
       // testDate: new Date(testDate),

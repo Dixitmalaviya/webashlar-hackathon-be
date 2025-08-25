@@ -262,12 +262,12 @@ export const getMyDoctors = async (req, res, next) => {
   try {
     const { entityId } = req.user;
 
-    if (req.user.role !== 'patient') {
-      return res.status(403).json({
-        ok: false,
-        message: 'Only patients can access this endpoint'
-      });
-    }
+    // if (req.user.role !== 'patient') {
+    //   return res.status(403).json({
+    //     ok: false,
+    //     message: 'Only patients can access this endpoint'
+    //   });
+    // }
 
     const doctors = await RelationshipService.getPatientDoctors(entityId);
 
