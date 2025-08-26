@@ -8,7 +8,7 @@ import Report from "../models/Report.js";
 // Register new user
 export const register = async (req, res, next) => {
   try {
-    const { email, password, role = 'patient', ...entityData } = req.body;
+    const { email, password, doctor, hospital, role = 'patient', ...entityData } = req.body;
     const blockchainHash = sha256OfObject({ ...req.body });
 
     // Validate required fields
@@ -34,12 +34,14 @@ export const register = async (req, res, next) => {
         message: "Password must be at least 6 characters long",
       });
     }
-
+    console.log("req.body-----=-=--=--=-=-==-=-=-", req.body, doctor, hospital)
     const result = await AuthService.register(
       { email, password },
       entityData,
       role,
-      blockchainHash
+      blockchainHash,
+      doctor,
+      hospital
     );
 
     res.status(201).json({
@@ -93,7 +95,7 @@ export const getProfile = async (req, res, next) => {
 
 export const deleteProfile = async (req, res, next) => {
   try {
-    const result = await AuthService.deleteProfile(req.user.id);
+    const result = await AuthService.deleteProfile(req.params.id);
 
     res.json({
       ok: true,
@@ -109,7 +111,7 @@ export const deleteProfile = async (req, res, next) => {
 // Update user profile
 export const updateProfile = async (req, res, next) => {
   try {
-    const user = await AuthService.updateProfile(req.user.id, { ...req?.body });
+    const user = await AuthService.updateProfile(req.params.id, { ...req?.body });
 
     res.json({
       ok: true,
