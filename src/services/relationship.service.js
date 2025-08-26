@@ -21,7 +21,7 @@ export class RelationshipService {
   // Create a new patient-doctor relationship
   static async createRelationship(relationshipData, req) {
     const { patientId, doctorId, hospitalId, relationshipType, notes } = relationshipData;
-    
+
     // Check if relationship already exists
     const existingRelationship = await Relationship.findOne({
       patient: patientId,
@@ -81,22 +81,31 @@ export class RelationshipService {
   }
 
   // Get all doctors for a patient
-  static async getPatientDoctors(patientId) {
-    const relationships = await Relationship.find({
-      patient: patientId,
-      isActive: true
-    }).populate([
-      {
-        path: 'doctor',
-        select: 'fullName licenseNumber specialization phone email yearsOfExperience'
-      },
-      {
-        path: 'hospital',
-        select: 'name address phone type'
-      }
+  static async getPatientDoctors(patientId, limit = 10, offset = 0) {
+    const [relationships, total] = await Promise.all([
+      Relationship.find({
+        patient: patientId,
+        isActive: true
+      })
+        .skip(offset)
+        .limit(limit)
+        .populate([
+          {
+            path: 'doctor',
+            select: 'fullName licenseNumber specialization phone email yearsOfExperience'
+          },
+          {
+            path: 'hospital',
+            select: 'name address phone type'
+          }
+        ]),
+      Relationship.countDocuments({
+        patient: patientId,
+        isActive: true
+      })
     ]);
 
-    return relationships.map(rel => ({
+    const data = relationships.map(rel => ({
       relationshipId: rel._id,
       relationshipType: rel.relationshipType,
       startDate: rel.startDate,
@@ -105,33 +114,47 @@ export class RelationshipService {
       hospital: rel.hospital,
       isActive: rel.isActive
     }));
+
+    return { data, total };
   }
 
+
   // Get all patients for a doctor
-  static async getDoctorPatients(doctorId) {
-    const relationships = await Relationship.find({
-      doctor: doctorId,
-      isActive: true
-    }).populate([
-      {
-        path: 'patient',
-        select: 'fullName dob phone email address emergencyContact'
-      },
-      {
-        path: 'hospital',
-        select: 'name address phone type'
-      }
+  static async getDoctorPatients(doctorId, limit = 10, offset = 0) {
+    const [relationships, total] = await Promise.all([
+      Relationship.find({
+        doctor: doctorId,
+        isActive: true
+      })
+        .skip(offset)
+        .limit(limit)
+        .populate([
+          {
+            path: 'patient',
+            select: 'fullName dob phone email address emergencyContact'
+          },
+          {
+            path: 'hospital',
+            select: 'name address phone type'
+          }
+        ]),
+      Relationship.countDocuments({
+        doctor: doctorId,
+        isActive: true
+      })
     ]);
 
-    return relationships.map(rel => ({
+    const data = relationships.map(rel => ({
       relationshipId: rel._id,
       relationshipType: rel.relationshipType,
       startDate: rel.startDate,
       notes: rel.notes,
-      patient: rel.patient,
+      ...rel.patient._doc,
       hospital: rel.hospital,
       isActive: rel.isActive
     }));
+
+    return { data, total };
   }
 
   // Get all medical records for a patient-doctor relationship
@@ -167,7 +190,7 @@ export class RelationshipService {
       select: 'reportType reportFileUrl reportData createdAt'
     });
 
-    const reports = records.flatMap(record => 
+    const reports = records.flatMap(record =>
       record.reports.map(report => ({
         recordId: record._id,
         recordDiagnosis: record.diagnosis,
@@ -205,7 +228,7 @@ export class RelationshipService {
 
     // Get all medical records
     const records = await this.getRelationshipRecords(patientId, doctorId);
-    
+
     // Get all reports
     const reports = await this.getRelationshipReports(patientId, doctorId);
 
@@ -252,7 +275,7 @@ export class RelationshipService {
 
     // Get all medical records
     const records = await this.getRelationshipRecords(patientId, doctorId);
-    
+
     // Get all reports
     const reports = await this.getRelationshipReports(patientId, doctorId);
 
@@ -279,7 +302,7 @@ export class RelationshipService {
   // End a relationship
   static async endRelationship(relationshipId, req) {
     const relationship = await Relationship.findById(relationshipId);
-    
+
     if (!relationship) {
       throw new Error('Relationship not found');
     }
@@ -315,7 +338,7 @@ export class RelationshipService {
   // Update relationship notes
   static async updateRelationshipNotes(relationshipId, notes, req) {
     const relationship = await Relationship.findById(relationshipId);
-    
+
     if (!relationship) {
       throw new Error('Relationship not found');
     }

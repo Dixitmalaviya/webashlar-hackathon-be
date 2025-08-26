@@ -15,7 +15,8 @@ import {
   getMyPatientData,
   getMyDoctorData,
   getHospitalRelationships,
-  getHospitalStats
+  getHospitalStats,
+  getHospitalDoctors
 } from '../controllers/relationship.controller.js';
 import { authenticateToken, requireRole } from '../middleware/auth.js';
 
@@ -28,12 +29,14 @@ r.use(authenticateToken);
 // r.post('/', requireRole(['admin', 'hospital']), createRelationship);
 r.post('/', createRelationship);
 
+r.get('/get-hospital-doctors/:hospitalId', getHospitalDoctors);
 // Get relationship statistics for current user
 r.get('/stats', getRelationshipStats);
 
 // Hospital-specific endpoints (only for hospitals)
 r.get('/hospital/relationships', requireRole('hospital'), getHospitalRelationships);
 r.get('/hospital/stats', requireRole('hospital'), getHospitalStats);
+
 
 // Patient-specific endpoints (only for patients)
 // r.get('/my-doctors', requireRole('patient'), getMyDoctors);

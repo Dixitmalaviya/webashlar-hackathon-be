@@ -6,6 +6,8 @@ import Doctor from '../models/Doctor.js';
 import Hospital from '../models/Hospital.js';
 import { config } from '../config/mode.js';
 import { sha256OfObject } from '../utils/hash.js';
+import mongoose from 'mongoose';
+import Relationship from '../models/Relationship.js';
 
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
@@ -102,7 +104,7 @@ export class AuthService {
   }
 
   // Register user
-  static async register(userData, entityData, role, blockchainHash) {
+  static async register(userData, entityData, role, blockchainHash, doctor, hospital) {
     const { email, password } = userData;
     console.log("userdarta", userData)
     // Check if user already exists
@@ -120,18 +122,17 @@ export class AuthService {
     let entity;
     let entityModel;
 
-
     switch (role) {
       case 'patient':
-        entity = await Patient.create({ ...userData, ...entityData });
+        entity = await Patient.create({ ...userData, ...entityData, contactNumber: entityData.phone });
         entityModel = 'Patient';
         break;
       case 'doctor':
-        entity = await Doctor.create({ ...userData, ...entityData });
+        entity = await Doctor.create({ ...userData, ...entityData, contactNumber: entityData.phone, hospital });
         entityModel = 'Doctor';
         break;
       case 'hospital':
-        entity = await Hospital.create({ ...userData, ...entityData });
+        entity = await Hospital.create({ ...userData, ...entityData, contactNumber: entityData.phone });
         entityModel = 'Hospital';
         break;
       default:
@@ -149,24 +150,64 @@ export class AuthService {
       blockchainHash,
       transactions: [{
         hash: blockchainHash,
-        description: 'User registered'
+        description: `${entityModel} registered`
       }],
     });
 
-
-
     console.log("user", user)
 
-    // entity = await Patient.create(entityData);
-    // entityModel = 'Patient';
+    if (doctor && hospital) {
+      // Validate entities exist
+      const [doctorDoc, hospitalDoc] = await Promise.all([
+        Doctor.findById(doctor),
+        Hospital.findById(hospital)
+      ]);
 
+      if (!doctorDoc) throw new Error('Doctor not found');
+      if (!hospitalDoc) throw new Error('Hospital not found');
+
+      const blockchainHash = sha256OfObject({
+        ...user.entityId,
+        doctor,
+        hospital,
+        relationshipType: 'primary_care',
+        timestamp: Date.now()
+      });
+
+      let txHash = null;
+
+      // Blockchain registration (if enabled)
+      if (config.features.consent.blockchain) {
+        const signer = signerFromHeader(req);
+        if (!signer) {
+          throw new Error('Missing x-user-private-key for on-chain relationship creation');
+        }
+
+        // Note: This would require a relationship contract or consent contract
+        // For now, we'll just store the hash
+        txHash = 'blockchain_hash_' + Date.now();
+      }
+
+      const relationship = await Relationship.create({
+        patient: user?.entityId,
+        doctor: doctorDoc,
+        hospital: hospitalDoc,
+        relationshipType: 'primary_care',
+        notes: '',
+        blockchainHash: blockchainHash,
+        blockchainTxHash: txHash,
+        blockchainEnabled: config.features.consent.blockchain
+      });
+
+      console.log("relationship created------->", relationship)
+    }
     const userdata = await User.findOneAndUpdate(
       { email: email.toLowerCase() },
       { createdBy: user._id.toString() },
       { new: true }
     )
     console.log("Updated user:", userdata)
-    
+
     // Generate token
     const token = this.generateToken(user);
 
@@ -189,11 +230,16 @@ export class AuthService {
 
   // Get current user
   static async getCurrentUser(userId) {
-    const user = await User.findById(userId);
+    const user = await User.findOne({
+      $or: [
+        { _id: new mongoose.Types.ObjectId(userId) },
+        { entityId: new mongoose.Types.ObjectId(userId) }
+      ]
+    });
     if (!user) {
       throw new Error('User not found');
     }
-
+    console.log("user--------------------", user)
     // Get entity details
     let entityDetails = null;
     try {
@@ -338,48 +384,135 @@ export class AuthService {
     return this.getCurrentUser(user._id);
   }
 
-  // Update user profile
+  // Update user profile with entity update
   static async updateProfile(userId, updateData) {
-    const user = await User.findById(userId);
+    // Allowed fields per entity model based on your schema
+    const allowedEntityFields = {
+      Patient: [
+        'fullName', 'dob', 'gender', 'bloodGroup',
+        'contactNumber', 'email', 'address',
+        'emergencyContact', 'walletAddress'
+      ],
+      Doctor: [
+        'fullName', 'specialization', 'qualification',
+        'licenseNumber', 'contactNumber', 'email',
+        'hospital', 'walletAddress', 'sbtTokenId'
+      ],
+      Hospital: [
+        'name', 'type', 'registrationNumber',
+        'contactNumber', 'email', 'address',
+        'walletAddress', 'sbtTokenId'
+      ]
+    };
+    const user = await User.findOne({
+      $or: [
+        { _id: new mongoose.Types.ObjectId(userId) },
+        { entityId: new mongoose.Types.ObjectId(userId) }
+      ]
+    });
+
     if (!user) {
       throw new Error('User not found');
     }
 
-    // Define allowed fields
-    const allowedUpdates = ['email'];
-    const updates = {};
-    let profileChanged = false;
+    console.log("updateData------", updateData)
 
-    for (const field of allowedUpdates) {
+    // Allowed user fields to update
+    const allowedUserUpdates = ['email'];
+    const userUpdates = {};
+    let profileChanged = false;
+    console.log("==========================================-1")
+    // Update user fields
+    for (const field of allowedUserUpdates) {
       if (updateData[field] !== undefined && updateData[field] !== user[field]) {
-        updates[field] = updateData[field];
+        userUpdates[field] = updateData[field];
         profileChanged = true;
       }
     }
-
+    console.log("==========================================0")
     if (profileChanged) {
-      // Apply updates
-      await User.findByIdAndUpdate(userId, updates, { new: true });
+      await User.findByIdAndUpdate(userId, userUpdates, { new: true });
+    }
 
-      // Re-fetch updated user
-      const updatedUser = await User.findById(userId);
+    console.log("==========================================1")
+    // Allowed entity fields from schema
+    const allowedEntityUpdates = allowedEntityFields[user.entityModel] || [];
 
-      // Prepare data for hashing — only relevant public data
-      const hashData = {
-        email: updatedUser.email,
-        walletAddress: updatedUser.walletAddress,
-        role: updatedUser.role,
-        entityId: updatedUser.entityId.toString()
-      };
+    // Prepare entity updates from input
+    const entityUpdates = {};
+    for (const field of allowedEntityUpdates) {
+      if (updateData[field] !== undefined) {
+        entityUpdates[field] = updateData[field];
+      }
+    }
+    console.log("==========================================2", entityUpdates)
+    if (Object.keys(entityUpdates).length > 0) {
+      const EntityModel = {
+        Patient,
+        Doctor,
+        Hospital
+      }[user.entityModel];
 
-      // Generate new blockchain hash
+      if (!EntityModel) {
+        throw new Error('Invalid entity model');
+      }
+
+      await EntityModel.findByIdAndUpdate(user.entityId, entityUpdates, { new: true });
+    }
+
+    // Re-fetch updated user
+    const updatedUser = await User.findOne({
+      $or: [
+        { _id: new mongoose.Types.ObjectId(userId) },
+        { entityId: new mongoose.Types.ObjectId(userId) }
+      ]
+    });
+    console.log("updated user-------------------------------------------------345", updatedUser)
+    // Prepare hash data
+    const hashData = {
+      email: updatedUser.email,
+      walletAddress: updatedUser.walletAddress,
+      role: updatedUser.role,
+      entityId: updatedUser.entityId.toString(),
+    };
+    console.log("hashData", hashData)
+    // Update blockchain hash if user profile changed
+    if (profileChanged) {
       const newHash = sha256OfObject(hashData);
-
-      // Update blockchainHash and add transaction
       updatedUser.blockchainHash = newHash;
       await updatedUser.addTransaction(newHash, 'Profile updated');
     }
 
+    // Return updated user + entity details
     return this.getCurrentUser(userId);
+  }
+
+  static async deleteProfile(userId) {
+    const user = await User.findOne({
+      $or: [
+        { _id: new mongoose.Types.ObjectId(userId) },
+        { entityId: new mongoose.Types.ObjectId(userId) }
+      ]
+    });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Delete the associated entity
+    const entityModels = { Patient, Doctor, Hospital };
+    const EntityModel = entityModels[user.entityModel];
+
+    if (EntityModel && user.entityId) {
+      await EntityModel.findByIdAndDelete(user.entityId);
+    }
+
+    // Delete the user
+    await User.findByIdAndDelete(userId);
+
+    return {
+      id: userId,
+      entityDeleted: user.entityId,
+      entityModel: user.entityModel
+    };
   }
 }

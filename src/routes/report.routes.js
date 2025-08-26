@@ -63,7 +63,7 @@ r.post("/upload", upload.single("file"), uploadReportFile);
 r.get("/:reportId/download", downloadReportFile);
 
 // Get all reports (with filtering)
-r.get("/", getReports);
+r.get("/", authenticateToken, getReports);
 
 // Get reports by entity
 r.get("/patient/:patientId", authenticateToken, getReportsByPatient);
