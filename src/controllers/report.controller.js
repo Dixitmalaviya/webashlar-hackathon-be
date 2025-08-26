@@ -1,9 +1,8 @@
-import { ReportService } from '../services/report.service.js';
-import axios from 'axios';
-import FormData from 'form-data';
-import fs from 'fs';
-import Report from '../models/Report.js';
-
+import { ReportService } from "../services/report.service.js";
+import axios from "axios";
+import FormData from "form-data";
+import fs from "fs";
+import Report from "../models/Report.js";
 
 // Create a new medical report
 export const createReport = async (req, res, next) => {
@@ -12,9 +11,9 @@ export const createReport = async (req, res, next) => {
 
     res.status(201).json({
       ok: true,
-      message: 'Medical report created successfully',
+      message: "Medical report created successfully",
       data: result.report,
-      txHash: result.txHash
+      txHash: result.txHash,
     });
   } catch (error) {
     next(error);
@@ -25,12 +24,12 @@ export const createReport = async (req, res, next) => {
 export const getReportById = async (req, res, next) => {
   try {
     const { reportId } = req.params;
-    console.log("reportId", reportId)
+    console.log("reportId", reportId);
 
     if (!reportId) {
       return res.status(400).json({
         ok: false,
-        message: 'Report ID is required'
+        message: "Report ID is required",
       });
     }
 
@@ -38,7 +37,7 @@ export const getReportById = async (req, res, next) => {
 
     res.json({
       ok: true,
-      data: report
+      data: report,
     });
   } catch (error) {
     next(error);
@@ -54,13 +53,13 @@ export const getReports = async (req, res, next) => {
       hospitalId: req.query.hospitalId,
       reportType: req.query.reportType,
       status: req.query.status,
-      isCritical: req.query.isCritical === 'true',
+      isCritical: req.query.isCritical === "true",
       startDate: req.query.startDate,
       endDate: req.query.endDate,
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 10,
-      sortBy: req.query.sortBy || 'reportDate',
-      sortOrder: req.query.sortOrder || 'desc'
+      sortBy: req.query.sortBy || "reportDate",
+      sortOrder: req.query.sortOrder || "desc",
     };
 
     const result = await ReportService.getReports(filters, req);
@@ -68,7 +67,7 @@ export const getReports = async (req, res, next) => {
     res.json({
       ok: true,
       data: result.reports,
-      pagination: result.pagination
+      pagination: result.pagination,
     });
   } catch (error) {
     next(error);
@@ -83,7 +82,7 @@ export const updateReport = async (req, res, next) => {
     if (!reportId) {
       return res.status(400).json({
         ok: false,
-        message: 'Report ID is required'
+        message: "Report ID is required",
       });
     }
 
@@ -91,9 +90,9 @@ export const updateReport = async (req, res, next) => {
 
     res.json({
       ok: true,
-      message: 'Report updated successfully',
+      message: "Report updated successfully",
       data: result.report,
-      txHash: result.txHash
+      txHash: result.txHash,
     });
   } catch (error) {
     next(error);
@@ -108,7 +107,7 @@ export const deleteReport = async (req, res, next) => {
     if (!reportId) {
       return res.status(400).json({
         ok: false,
-        message: 'Report ID is required'
+        message: "Report ID is required",
       });
     }
 
@@ -117,7 +116,7 @@ export const deleteReport = async (req, res, next) => {
     res.json({
       ok: true,
       message: result.message,
-      txHash: result.txHash
+      txHash: result.txHash,
     });
   } catch (error) {
     next(error);
@@ -132,7 +131,7 @@ export const markAsReviewed = async (req, res, next) => {
     if (!reportId) {
       return res.status(400).json({
         ok: false,
-        message: 'Report ID is required'
+        message: "Report ID is required",
       });
     }
 
@@ -141,7 +140,7 @@ export const markAsReviewed = async (req, res, next) => {
     res.json({
       ok: true,
       message: result.message,
-      data: result.report
+      data: result.report,
     });
   } catch (error) {
     next(error);
@@ -156,7 +155,7 @@ export const markAsCritical = async (req, res, next) => {
     if (!reportId) {
       return res.status(400).json({
         ok: false,
-        message: 'Report ID is required'
+        message: "Report ID is required",
       });
     }
 
@@ -165,7 +164,7 @@ export const markAsCritical = async (req, res, next) => {
     res.json({
       ok: true,
       message: result.message,
-      data: result.report
+      data: result.report,
     });
   } catch (error) {
     next(error);
@@ -177,24 +176,28 @@ export const getReportsByPatient = async (req, res, next) => {
   try {
     const { patientId } = req.params;
     const options = {
-      status: req.query.status,
-      reportType: req.query.reportType,
-      isCritical: req.query.isCritical === 'true'
+      // status: req.query.status,
+      // reportType: req.query.reportType,
+      // isCritical: req.query.isCritical === 'true'
     };
 
     if (!patientId) {
       return res.status(400).json({
         ok: false,
-        message: 'Patient ID is required'
+        message: "Patient ID is required",
       });
     }
 
-    const reports = await ReportService.getReportsByPatient(patientId, options, req);
+    const reports = await ReportService.getReportsByPatient(
+      patientId,
+      options,
+      req
+    );
 
     res.json({
       ok: true,
       data: reports,
-      count: reports.length
+      count: reports.length,
     });
   } catch (error) {
     next(error);
@@ -207,22 +210,26 @@ export const getReportsByDoctor = async (req, res, next) => {
     const { doctorId } = req.params;
     const options = {
       status: req.query.status,
-      reportType: req.query.reportType
+      reportType: req.query.reportType,
     };
 
     if (!doctorId) {
       return res.status(400).json({
         ok: false,
-        message: 'Doctor ID is required'
+        message: "Doctor ID is required",
       });
     }
 
-    const reports = await ReportService.getReportsByDoctor(doctorId, options, req);
+    const reports = await ReportService.getReportsByDoctor(
+      doctorId,
+      options,
+      req
+    );
 
     res.json({
       ok: true,
       data: reports,
-      count: reports.length
+      count: reports.length,
     });
   } catch (error) {
     next(error);
@@ -237,15 +244,15 @@ export const getReportsByHospital = async (req, res, next) => {
       hospitalId,
       reportType: req.query.reportType,
       status: req.query.status,
-      isCritical: req.query.isCritical === 'true',
+      isCritical: req.query.isCritical === "true",
       page: parseInt(req.query.page) || 1,
-      limit: parseInt(req.query.limit) || 10
+      limit: parseInt(req.query.limit) || 10,
     };
 
     if (!hospitalId) {
       return res.status(400).json({
         ok: false,
-        message: 'Hospital ID is required'
+        message: "Hospital ID is required",
       });
     }
 
@@ -254,7 +261,7 @@ export const getReportsByHospital = async (req, res, next) => {
     res.json({
       ok: true,
       data: result.reports,
-      pagination: result.pagination
+      pagination: result.pagination,
     });
   } catch (error) {
     next(error);
@@ -271,7 +278,7 @@ export const getCriticalReports = async (req, res, next) => {
     res.json({
       ok: true,
       data: reports,
-      count: reports.length
+      count: reports.length,
     });
   } catch (error) {
     next(error);
@@ -283,14 +290,14 @@ export const getReportStats = async (req, res, next) => {
   try {
     const filters = {
       startDate: req.query.startDate,
-      endDate: req.query.endDate
+      endDate: req.query.endDate,
     };
 
     const stats = await ReportService.getReportStats(filters, req);
 
     res.json({
       ok: true,
-      data: stats
+      data: stats,
     });
   } catch (error) {
     next(error);
@@ -304,14 +311,14 @@ export const searchReports = async (req, res, next) => {
     const filters = {
       reportType: req.query.reportType,
       status: req.query.status,
-      isCritical: req.query.isCritical === 'true',
-      limit: parseInt(req.query.limit) || 20
+      isCritical: req.query.isCritical === "true",
+      limit: parseInt(req.query.limit) || 20,
     };
 
     if (!searchTerm) {
       return res.status(400).json({
         ok: false,
-        message: 'Search term is required'
+        message: "Search term is required",
       });
     }
 
@@ -320,7 +327,7 @@ export const searchReports = async (req, res, next) => {
     res.json({
       ok: true,
       data: reports,
-      count: reports.length
+      count: reports.length,
     });
   } catch (error) {
     next(error);
@@ -333,13 +340,13 @@ export const getMyReports = async (req, res, next) => {
     const filters = {
       reportType: req.query.reportType,
       status: req.query.status,
-      isCritical: req.query.isCritical === 'true',
+      isCritical: req.query.isCritical === "true",
       startDate: req.query.startDate,
       endDate: req.query.endDate,
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 10,
-      sortBy: req.query.sortBy || 'reportDate',
-      sortOrder: req.query.sortOrder || 'desc'
+      sortBy: req.query.sortBy || "reportDate",
+      sortOrder: req.query.sortOrder || "desc",
     };
 
     const result = await ReportService.getReports(filters, req);
@@ -347,7 +354,7 @@ export const getMyReports = async (req, res, next) => {
     res.json({
       ok: true,
       data: result.reports,
-      pagination: result.pagination
+      pagination: result.pagination,
     });
   } catch (error) {
     next(error);
@@ -359,14 +366,14 @@ export const getMyReportStats = async (req, res, next) => {
   try {
     const filters = {
       startDate: req.query.startDate,
-      endDate: req.query.endDate
+      endDate: req.query.endDate,
     };
 
     const stats = await ReportService.getReportStats(filters, req);
 
     res.json({
       ok: true,
-      data: stats
+      data: stats,
     });
   } catch (error) {
     next(error);
@@ -377,27 +384,27 @@ export const getMyReportStats = async (req, res, next) => {
 export const getReportTypes = async (req, res, next) => {
   try {
     const reportTypes = [
-      'blood_test',
-      'urine_test',
-      'x_ray',
-      'mri_scan',
-      'ct_scan',
-      'ecg',
-      'ultrasound',
-      'biopsy',
-      'pathology',
-      'radiology',
-      'cardiology',
-      'neurology',
-      'pulmonology',
-      'endocrinology',
-      'general_lab',
-      'other'
+      "blood_test",
+      "urine_test",
+      "x_ray",
+      "mri_scan",
+      "ct_scan",
+      "ecg",
+      "ultrasound",
+      "biopsy",
+      "pathology",
+      "radiology",
+      "cardiology",
+      "neurology",
+      "pulmonology",
+      "endocrinology",
+      "general_lab",
+      "other",
     ];
 
     res.json({
       ok: true,
-      data: reportTypes
+      data: reportTypes,
     });
   } catch (error) {
     next(error);
@@ -408,16 +415,16 @@ export const getReportTypes = async (req, res, next) => {
 export const getReportStatuses = async (req, res, next) => {
   try {
     const statuses = [
-      'pending',
-      'in_progress',
-      'completed',
-      'reviewed',
-      'archived'
+      "pending",
+      "in_progress",
+      "completed",
+      "reviewed",
+      "archived",
     ];
 
     res.json({
       ok: true,
-      data: statuses
+      data: statuses,
     });
   } catch (error) {
     next(error);
@@ -427,17 +434,11 @@ export const getReportStatuses = async (req, res, next) => {
 // Get access levels
 export const getAccessLevels = async (req, res, next) => {
   try {
-    const accessLevels = [
-      'private',
-      'patient',
-      'doctor',
-      'hospital',
-      'public'
-    ];
+    const accessLevels = ["private", "patient", "doctor", "hospital", "public"];
 
     res.json({
       ok: true,
-      data: accessLevels
+      data: accessLevels,
     });
   } catch (error) {
     next(error);
@@ -453,29 +454,35 @@ export const uploadReportFile = async (req, res, next) => {
     const file = req.file;
 
     if (!file || !patientId || !reportName) {
-      return res.status(400).json({ ok: false, message: 'File or or reportName patient_id missing' });
+      return res
+        .status(400)
+        .json({
+          ok: false,
+          message: "File or or reportName patient_id missing",
+        });
     }
 
     // Prepare form-data for the 3rd party API
     const form = new FormData();
-    form.append('patient_id', patientId);
-    form.append('files', fs.createReadStream(file.path), file.originalname);
+    form.append("patient_id", patientId);
+    form.append("files", fs.createReadStream(file.path), file.originalname);
 
     // Send to external API
     const uploadResponse = await axios.post(
-      'https://webashalarforml-health-dac-assist.hf.space/upload_reports',
+      "https://webashalarforml-health-dac-assist.hf.space/upload_reports",
       form,
       {
         headers: {
           ...form.getHeaders(),
-          'accept': '*/*',
-          'origin': 'https://webashalarforml-health-dac-assist.hf.space',
-          'referer': 'https://webashalarforml-health-dac-assist.hf.space/',
-          'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36'
-        }
+          accept: "*/*",
+          origin: "https://webashalarforml-health-dac-assist.hf.space",
+          referer: "https://webashalarforml-health-dac-assist.hf.space/",
+          "user-agent":
+            "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36",
+        },
       }
     );
-    console.log("uploadResponse", uploadResponse)
+    console.log("uploadResponse", uploadResponse);
     // Step 2: Extract uploaded file info from response
     const uploadedFileUrl = uploadResponse.data?.patient_folder || null;
     const uploadedFileName = file.originalname;
@@ -491,21 +498,20 @@ export const uploadReportFile = async (req, res, next) => {
       // createdBy,
       reportFileUrl: uploadedFileUrl,
       reportFileName: uploadedFileName,
-      reportName: reportName
+      reportName: reportName,
     });
 
     // Clean up local file
-    fs.unlink(file.path, err => {
-      if (err) console.error('Failed to delete local file:', err);
+    fs.unlink(file.path, (err) => {
+      if (err) console.error("Failed to delete local file:", err);
     });
 
     // Send response back to frontend
     res.json({
       ok: true,
-      message: 'File uploaded and forwarded successfully',
-      data: { ...uploadResponse.data, newReport }
+      message: "File uploaded and forwarded successfully",
+      data: { ...uploadResponse.data, newReport },
     });
-
   } catch (error) {
     next(error);
   }
@@ -519,7 +525,7 @@ export const downloadReportFile = async (req, res, next) => {
     if (!reportId) {
       return res.status(400).json({
         ok: false,
-        message: 'Report ID is required'
+        message: "Report ID is required",
       });
     }
 
@@ -528,7 +534,7 @@ export const downloadReportFile = async (req, res, next) => {
     if (!report.reportFileUrl) {
       return res.status(404).json({
         ok: false,
-        message: 'No file attached to this report'
+        message: "No file attached to this report",
       });
     }
 
@@ -539,8 +545,8 @@ export const downloadReportFile = async (req, res, next) => {
       data: {
         fileUrl: report.reportFileUrl,
         fileName: report.reportFileName,
-        message: 'File download endpoint - implement file download service'
-      }
+        message: "File download endpoint - implement file download service",
+      },
     });
   } catch (error) {
     next(error);

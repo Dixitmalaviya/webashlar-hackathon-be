@@ -1,9 +1,9 @@
-import { AuthService } from '../services/auth.service.js';
-import { sha256OfObject } from '../utils/hash.js';
-import ChatRoom from '../models/ChatRoom.js'
-import axios from 'axios';
-import Patient from '../models/Patient.js'; // Make sure this path is correct
-import Report from '../models/Report.js';
+import { AuthService } from "../services/auth.service.js";
+import { sha256OfObject } from "../utils/hash.js";
+import ChatRoom from "../models/ChatRoom.js";
+import axios from "axios";
+import Patient from "../models/Patient.js"; // Make sure this path is correct
+import Report from "../models/Report.js";
 
 // Register new user
 export const register = async (req, res, next) => {
@@ -11,21 +11,20 @@ export const register = async (req, res, next) => {
     const { email, password, role, ...entityData } = req.body;
     const blockchainHash = sha256OfObject({ ...req.body });
 
-
     // Validate required fields
     if (!email || !password) {
       return res.status(400).json({
         ok: false,
-        message: 'Email, password are required'
+        message: "Email, password are required",
       });
     }
 
     // Validate role
-    const validRoles = ['patient', 'doctor', 'hospital'];
+    const validRoles = ["patient", "doctor", "hospital"];
     if (!validRoles.includes(role)) {
       return res.status(400).json({
         ok: false,
-        message: 'Invalid role. Must be one of: patient, doctor, hospital'
+        message: "Invalid role. Must be one of: patient, doctor, hospital",
       });
     }
 
@@ -33,7 +32,7 @@ export const register = async (req, res, next) => {
     if (password.length < 6) {
       return res.status(400).json({
         ok: false,
-        message: 'Password must be at least 6 characters long'
+        message: "Password must be at least 6 characters long",
       });
     }
 
@@ -46,8 +45,8 @@ export const register = async (req, res, next) => {
 
     res.status(201).json({
       ok: true,
-      message: 'User registered successfully',
-      data: result
+      message: "User registered successfully",
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -63,7 +62,7 @@ export const login = async (req, res, next) => {
     if (!email || !password) {
       return res.status(400).json({
         ok: false,
-        message: 'Email and password are required'
+        message: "Email and password are required",
       });
     }
 
@@ -71,8 +70,8 @@ export const login = async (req, res, next) => {
 
     res.json({
       ok: true,
-      message: 'Login successful',
-      data: result
+      message: "Login successful",
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -86,7 +85,7 @@ export const getProfile = async (req, res, next) => {
 
     res.json({
       ok: true,
-      data: user
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -102,8 +101,8 @@ export const updateProfile = async (req, res, next) => {
 
     res.json({
       ok: true,
-      message: 'Profile updated successfully',
-      data: user
+      message: "Profile updated successfully",
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -119,7 +118,7 @@ export const changePassword = async (req, res, next) => {
     if (!currentPassword || !newPassword) {
       return res.status(400).json({
         ok: false,
-        message: 'Current password and new password are required'
+        message: "Current password and new password are required",
       });
     }
 
@@ -127,7 +126,7 @@ export const changePassword = async (req, res, next) => {
     if (newPassword.length < 6) {
       return res.status(400).json({
         ok: false,
-        message: 'New password must be at least 6 characters long'
+        message: "New password must be at least 6 characters long",
       });
     }
 
@@ -135,7 +134,7 @@ export const changePassword = async (req, res, next) => {
 
     res.json({
       ok: true,
-      message: 'Password changed successfully'
+      message: "Password changed successfully",
     });
   } catch (error) {
     next(error);
@@ -150,7 +149,7 @@ export const forgotPassword = async (req, res, next) => {
     if (!email) {
       return res.status(400).json({
         ok: false,
-        message: 'Email is required'
+        message: "Email is required",
       });
     }
 
@@ -158,8 +157,8 @@ export const forgotPassword = async (req, res, next) => {
 
     res.json({
       ok: true,
-      message: 'Password reset instructions sent to email',
-      data: result
+      message: "Password reset instructions sent to email",
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -174,7 +173,7 @@ export const resetPassword = async (req, res, next) => {
     if (!token || !newPassword) {
       return res.status(400).json({
         ok: false,
-        message: 'Token and new password are required'
+        message: "Token and new password are required",
       });
     }
 
@@ -182,7 +181,7 @@ export const resetPassword = async (req, res, next) => {
     if (newPassword.length < 6) {
       return res.status(400).json({
         ok: false,
-        message: 'New password must be at least 6 characters long'
+        message: "New password must be at least 6 characters long",
       });
     }
 
@@ -190,7 +189,7 @@ export const resetPassword = async (req, res, next) => {
 
     res.json({
       ok: true,
-      message: 'Password reset successfully'
+      message: "Password reset successfully",
     });
   } catch (error) {
     next(error);
@@ -204,7 +203,7 @@ export const refreshToken = async (req, res, next) => {
 
     res.json({
       ok: true,
-      data: result
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -218,7 +217,7 @@ export const logout = async (req, res, next) => {
 
     res.json({
       ok: true,
-      message: 'Logged out successfully'
+      message: "Logged out successfully",
     });
   } catch (error) {
     next(error);
@@ -233,7 +232,7 @@ export const getUserByWallet = async (req, res, next) => {
     if (!walletAddress) {
       return res.status(400).json({
         ok: false,
-        message: 'Wallet address is required'
+        message: "Wallet address is required",
       });
     }
 
@@ -241,7 +240,7 @@ export const getUserByWallet = async (req, res, next) => {
 
     res.json({
       ok: true,
-      data: user
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -251,13 +250,13 @@ export const getUserByWallet = async (req, res, next) => {
 // Verify token (for client-side token validation)
 export const verifyToken = async (req, res, next) => {
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
 
     if (!token) {
       return res.status(401).json({
         ok: false,
-        message: 'Token is required'
+        message: "Token is required",
       });
     }
 
@@ -268,20 +267,19 @@ export const verifyToken = async (req, res, next) => {
       ok: true,
       data: {
         valid: true,
-        user
-      }
+        user,
+      },
     });
   } catch (error) {
     res.status(401).json({
       ok: false,
-      message: 'Invalid or expired token',
+      message: "Invalid or expired token",
       data: {
-        valid: false
-      }
+        valid: false,
+      },
     });
   }
 };
-
 
 // Chat - Handle patient message and update chat room
 // export const handlePatientMessage = async (req, res, next) => {
@@ -353,12 +351,14 @@ export const handlePatientMessage = async (req, res, next) => {
     const { patientId, inputtext } = req.body;
 
     if (!patientId || !inputtext) {
-      return res.status(400).json({ ok: false, message: 'patientId and inputtext are required' });
+      return res
+        .status(400)
+        .json({ ok: false, message: "patientId and inputtext are required" });
     }
     // ✅ Step 0: Check if patient exists
     const patient = await Patient.findById(patientId);
     if (!patient) {
-      return res.status(404).json({ ok: false, message: 'Patient not found' });
+      return res.status(404).json({ ok: false, message: "Patient not found" });
     }
 
     // Step 1: Find or create the chat room
@@ -368,15 +368,15 @@ export const handlePatientMessage = async (req, res, next) => {
       chatRoom = new ChatRoom({
         patient: patientId,
         conversation: [],
-        summary: '',
-        patientDetails: {} // Initialize empty
+        summary: "",
+        patientDetails: {}, // Initialize empty
       });
     }
 
     // Step 2: Push patient's message to conversation
     const newMessage = {
       inputtext,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
     chatRoom.conversation.push(newMessage);
 
@@ -384,34 +384,39 @@ export const handlePatientMessage = async (req, res, next) => {
     const chatHistory = chatRoom.conversation.flatMap((msg) => {
       const history = [];
       if (msg.inputtext) {
-        history.push({ role: 'user', content: msg.inputtext });
+        history.push({ role: "user", content: msg.inputtext });
       }
       if (msg.outputtext) {
-        history.push({ role: 'assistant', content: msg.outputtext });
+        history.push({ role: "assistant", content: msg.outputtext });
       }
       return history;
     });
 
-
-
     const payload = {
       chat_history: chatHistory,
+      asked_for_pid: true,
       patient_state: {
-        assistant_reply: chatRoom.conversation[chatRoom.conversation.length - 2]?.outputtext || '',
-        conversationSummary: chatRoom.summary || '',
-        patientDetails: { ...chatRoom.patientDetails, pid: patientId } || {}
-      }
-    }
-    console.log("PAYLOAD", payload)
+        assistant_reply:
+          chatRoom.conversation[chatRoom.conversation.length - 2]?.outputtext ||
+          "",
+        conversationSummary: chatRoom.summary || "",
+        patientDetails: { ...chatRoom.patientDetails, pid: patientId } || {},
+      },
+    };
+    console.log("PAYLOAD", payload);
 
     // Step 4: Call third-party chatbot API
-    const apiResponse = await axios.post('https://webashalarforml-patient-bot.hf.space/chat', payload, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': '*/*'
+    const apiResponse = await axios.post(
+      "https://webashalarforml-patient-bot.hf.space/chat",
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
       }
-    });
-    console.log("apiResponse.data", apiResponse.data)
+    );
+    console.log("apiResponse.data", apiResponse.data);
     const { assistant_reply, updated_state } = apiResponse.data;
 
     // Step 5: Update last message with outputtext
@@ -435,16 +440,15 @@ export const handlePatientMessage = async (req, res, next) => {
     // Step 8: Respond with updated data
     res.json({
       ok: true,
-      message: 'Chat updated successfully',
+      message: "Chat updated successfully",
       data: {
         summary: chatRoom.summary,
         conversation: chatRoom.conversation,
-        patientDetails: chatRoom.patientDetails
-      }
+        patientDetails: chatRoom.patientDetails,
+      },
     });
-
   } catch (error) {
-    console.error('Error in chat handler:', error.message);
+    console.error("Error in chat handler:", error.message);
     next(error);
   }
 };
@@ -455,26 +459,30 @@ export const getChatHistory = async (req, res, next) => {
     const { patientId } = req.params;
 
     if (!patientId) {
-      return res.status(400).json({ ok: false, message: 'patientId is required' });
+      return res
+        .status(400)
+        .json({ ok: false, message: "patientId is required" });
     }
 
     const chatRoom = await ChatRoom.findOne({ patient: patientId }).lean();
 
     if (!chatRoom) {
-      return res.status(404).json({ ok: false, message: 'No chat history found for this patient' });
+      return res
+        .status(404)
+        .json({ ok: false, message: "No chat history found for this patient" });
     }
 
     res.json({
       ok: true,
-      message: 'Chat history retrieved successfully',
+      message: "Chat history retrieved successfully",
       data: {
-        summary: chatRoom.summary || '',
+        summary: chatRoom.summary || "",
         conversation: chatRoom.conversation || [],
-        patientDetails: chatRoom.patientDetails || {}
-      }
+        patientDetails: chatRoom.patientDetails || {},
+      },
     });
   } catch (error) {
-    console.error('Get Chat History Error:', error.message);
+    console.error("Get Chat History Error:", error.message);
     next(error);
   }
 };
@@ -526,7 +534,6 @@ export const getChatHistory = async (req, res, next) => {
 //       }
 //     );
 
-
 //     // Step 4: Call third-party chatbot API
 //     // const apiResponse = await axios.post('https://webashalarforml-patient-bot.hf.space/chat', payload, {
 //     //   headers: {
@@ -550,34 +557,51 @@ export const getChatHistory = async (req, res, next) => {
 //   }
 // };
 
-
-import path from 'path';
+import path from "path";
 
 export const reportAnalyseData = async (req, res, next) => {
   try {
     const { patientId, fromDate, toDate } = req.body;
 
-    // Fetch reports within date range
-    const reports = await Report.find({
+    // // Fetch reports within date range
+    // const reports = await Report.find({
+    //   patient: patientId,
+    //   reportDate: {
+    //     $gte: new Date(fromDate),
+    //     $lte: new Date(toDate),
+    //   },
+    //   reportFileName: { $ne: null },
+    // });
+
+    // Build query based on presence of fromDate and toDate
+    const query = {
       patient: patientId,
-      reportDate: {
+      reportFileName: { $ne: null },
+    };
+
+    if (fromDate && toDate) {
+      query.reportDate = {
         $gte: new Date(fromDate),
-        $lte: new Date(toDate)
-      },
-      reportFileName: { $ne: null }
-    });
+        $lte: new Date(toDate),
+      };
+    }
+
+    // Fetch reports
+    const reports = await Report.find(query);
 
     if (reports.length === 0) {
       return res.status(404).json({ message: "No reports found." });
     }
 
     // Extract just the filenames (basename) from URLs or strings
-    let fileNames = reports.map(r => {
-      if (r.reportFileName) {
-        // This will extract filename from URL or path
-        return path.basename(r.reportFileName);
-      }
-    }).filter(Boolean);
+    let fileNames = reports
+      .map((r) => {
+        if (r.reportFileName) {
+          // This will extract filename from URL or path
+          return path.basename(r.reportFileName);
+        }
+      })
+      .filter(Boolean);
 
     // Remove duplicates
     fileNames = [...new Set(fileNames)];
@@ -587,18 +611,18 @@ export const reportAnalyseData = async (req, res, next) => {
 
     const payload = {
       patient_id: patientId, // Or mapped patient code if needed
-      filenames: fileNames
+      filenames: fileNames,
     };
 
     // Call external API
     const response = await axios.post(
-      'https://webashalarforml-health-dac-assist.hf.space/process_reports',
+      "https://webashalarforml-health-dac-assist.hf.space/process_reports",
       payload,
       {
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': '*/*'
-        }
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
       }
     );
 
@@ -607,9 +631,8 @@ export const reportAnalyseData = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       reportNames: fileNames,
-      data: response.data
+      data: response.data,
     });
-
   } catch (error) {
     console.error("Analysis API Error:", error.message);
 
@@ -620,7 +643,7 @@ export const reportAnalyseData = async (req, res, next) => {
 
     return res.status(500).json({
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
     });
   }
 };
