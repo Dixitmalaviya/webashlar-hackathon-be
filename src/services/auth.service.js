@@ -128,7 +128,7 @@ export class AuthService {
         entityModel = 'Patient';
         break;
       case 'doctor':
-        entity = await Doctor.create({ ...userData, ...entityData, contactNumber: entityData.phone });
+        entity = await Doctor.create({ ...userData, ...entityData, contactNumber: entityData.phone, hospital });
         entityModel = 'Doctor';
         break;
       case 'hospital':
