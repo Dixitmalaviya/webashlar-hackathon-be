@@ -8,7 +8,8 @@ import {
   getHospital,
   getAllPatients,
   getAllDoctors,
-  getAllHospitals
+  getAllHospitals,
+  getAllHospitalsAll
 } from '../controllers/identity.controller.js';
 
 const r = Router();
@@ -27,5 +28,6 @@ r.get('/hospital/:id', getHospital);
 r.get('/patients', getAllPatients);
 r.get('/doctors', getAllDoctors);
 r.get('/hospitals', getAllHospitals);
+r.get('/hospitals/options', getAllHospitalsAll);
 
 export default r;

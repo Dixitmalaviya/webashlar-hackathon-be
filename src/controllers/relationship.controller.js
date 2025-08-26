@@ -300,7 +300,7 @@ export const getMyPatients = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
-    const { data: patients, total } = await RelationshipService.getDoctorPatients(entityId, limit, offset);
+    const { data: patients, total } = await RelationshipService.getDoctorPatients(entityId, limit, offset).sort({ "createdAt": -1 });
 
     res.json({
       ok: true,

@@ -132,9 +132,9 @@ export class IdentityService {
   //   return await Doctor.find({});
   // }
 
-  // static async getAllHospitals() {
-  //   return await Hospital.find({});
-  // }
+  static async getAllHospitalsAll() {
+    return await Hospital.find({}).select("name");
+  }
 
   static async getAllPatients({ page = 1, limit = 10 } = {}) {
     const skip = (page - 1) * limit;

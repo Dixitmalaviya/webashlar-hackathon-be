@@ -100,12 +100,12 @@ export const getHospital = async (req, res, next) => {
 //   } catch (err) { next(err); }
 // };
 
-// export const getAllHospitals = async (req, res, next) => {
-//   try {
-//     const hospitals = await IdentityService.getAllHospitals();
-//     res.json({ ok: true, hospitals });
-//   } catch (err) { next(err); }
-// };
+export const getAllHospitalsAll = async (req, res, next) => {
+  try {
+    const hospitals = await IdentityService.getAllHospitalsAll();
+    res.json({ ok: true, hospitals });
+  } catch (err) { next(err); }
+};
 
 export const getAllPatients = async (req, res, next) => {
   try {
