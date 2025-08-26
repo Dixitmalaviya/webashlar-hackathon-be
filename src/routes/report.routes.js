@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router } from "express";
 import {
   createReport,
   getReportById,
@@ -19,17 +19,17 @@ import {
   getReportStatuses,
   getAccessLevels,
   uploadReportFile,
-  downloadReportFile
-} from '../controllers/report.controller.js';
-import { authenticateToken, requireRole } from '../middleware/auth.js';
-import multer from 'multer';
-import axios from 'axios';
-import FormData from 'form-data';
-import fs from 'fs';
-import path from 'path';
+  downloadReportFile,
+} from "../controllers/report.controller.js";
+import { authenticateToken, requireRole } from "../middleware/auth.js";
+import multer from "multer";
+import axios from "axios";
+import FormData from "form-data";
+import fs from "fs";
+import path from "path";
 
 // multer setup (store uploaded file temporarily)
-const upload = multer({ dest: 'uploads/' }); // you can configure a temp directory
+const upload = multer({ dest: "uploads/" }); // you can configure a temp directory
 
 const r = Router();
 
@@ -37,41 +37,41 @@ const r = Router();
 // r.use(authenticateToken);
 
 // Public endpoints (for authenticated users)
-r.get('/types', getReportTypes);
-r.get('/statuses', getReportStatuses);
-r.get('/access-levels', getAccessLevels);
+r.get("/types", getReportTypes);
+r.get("/statuses", getReportStatuses);
+r.get("/access-levels", getAccessLevels);
 
 // My reports endpoints (role-based access)
-r.get('/my-reports', getMyReports);
-r.get('/my-stats', getMyReportStats);
+r.get("/my-reports", getMyReports);
+r.get("/my-stats", getMyReportStats);
 
 // Search reports
-r.get('/search', searchReports);
+r.get("/search", searchReports);
 
 // CRUD operations
-r.post('/', requireRole(['doctor', 'admin']), createReport);
-r.get('/:reportId', getReportById);
-r.put('/:reportId', updateReport);
-r.delete('/:reportId', requireRole(['admin']), deleteReport);
+r.post("/", requireRole(["doctor", "admin"]), createReport);
+r.get("/:reportId", getReportById);
+r.put("/:reportId", updateReport);
+r.delete("/:reportId", authenticateToken, deleteReport);
 
 // Report actions
-r.put('/:reportId/review', requireRole(['doctor']), markAsReviewed);
-r.put('/:reportId/critical', requireRole(['doctor']), markAsCritical);
+r.put("/:reportId/review", requireRole(["doctor"]), markAsReviewed);
+r.put("/:reportId/critical", requireRole(["doctor"]), markAsCritical);
 
 // File operations
-r.post('/upload', upload.single('file'), uploadReportFile);
-r.get('/:reportId/download', downloadReportFile);
+r.post("/upload", upload.single("file"), uploadReportFile);
+r.get("/:reportId/download", downloadReportFile);
 
 // Get all reports (with filtering)
-r.get('/', getReports);
+r.get("/", getReports);
 
 // Get reports by entity
-r.get('/patient/:patientId', getReportsByPatient);
-r.get('/doctor/:doctorId', getReportsByDoctor);
-r.get('/hospital/:hospitalId', getReportsByHospital);
+r.get("/patient/:patientId", authenticateToken, getReportsByPatient);
+r.get("/doctor/:doctorId", getReportsByDoctor);
+r.get("/hospital/:hospitalId", getReportsByHospital);
 
 // Special endpoints
-r.get('/critical/all', getCriticalReports);
-r.get('/stats/all', getReportStats);
+r.get("/critical/all", getCriticalReports);
+r.get("/stats/all", getReportStats);
 
 export default r;

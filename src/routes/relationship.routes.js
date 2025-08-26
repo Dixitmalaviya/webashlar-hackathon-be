@@ -25,7 +25,8 @@ const r = Router();
 r.use(authenticateToken);
 
 // Create relationship (admin or hospital can create)
-r.post('/', requireRole(['admin', 'hospital']), createRelationship);
+// r.post('/', requireRole(['admin', 'hospital']), createRelationship);
+r.post('/', createRelationship);
 
 // Get relationship statistics for current user
 r.get('/stats', getRelationshipStats);
@@ -35,12 +36,16 @@ r.get('/hospital/relationships', requireRole('hospital'), getHospitalRelationshi
 r.get('/hospital/stats', requireRole('hospital'), getHospitalStats);
 
 // Patient-specific endpoints (only for patients)
-r.get('/my-doctors', requireRole('patient'), getMyDoctors);
-r.get('/my-doctor/:doctorId', requireRole('patient'), getMyDoctorData);
+// r.get('/my-doctors', requireRole('patient'), getMyDoctors);
+r.get('/my-doctors', getMyDoctors);
+// r.get('/my-doctor/:doctorId', requireRole('patient'), getMyDoctorData);
+r.get('/my-doctor/:doctorId', getMyDoctorData);
 
 // Doctor-specific endpoints (only for doctors)
-r.get('/my-patients', requireRole('doctor'), getMyPatients);
-r.get('/my-patient/:patientId', requireRole('doctor'), getMyPatientData);
+// r.get('/my-patients', requireRole('doctor'), getMyPatients);
+r.get('/my-patients', getMyPatients);
+// r.get('/my-patient/:patientId', requireRole('doctor'), getMyPatientData);
+r.get('/my-patient/:patientId', getMyPatientData);
 
 // General relationship endpoints (admin access)
 r.get('/patient/:patientId/doctors', requireRole('admin'), getPatientDoctors);

@@ -1,51 +1,52 @@
-import { AuthService } from '../services/auth.service.js';
-import { sha256OfObject } from '../utils/hash.js';
+import { AuthService } from "../services/auth.service.js";
+import { sha256OfObject } from "../utils/hash.js";
+import ChatRoom from "../models/ChatRoom.js";
+import axios from "axios";
+import Patient from "../models/Patient.js"; // Make sure this path is correct
+import Report from "../models/Report.js";
 
 // Register new user
 export const register = async (req, res, next) => {
   try {
-    // const { email, password, walletAddress, role, ...entityData } = req.body;
-    const { email, password, ...rest } = req.body;
-    const entityData = { ...rest, email };
+    const { email, password, role, ...entityData } = req.body;
     const blockchainHash = sha256OfObject({ ...req.body });
-
 
     // Validate required fields
     if (!email || !password) {
       return res.status(400).json({
         ok: false,
-        message: 'Email, password are required'
+        message: "Email, password are required",
       });
     }
 
     // Validate role
-    // const validRoles = ['patient', 'doctor', 'hospital'];
-    // if (!validRoles.includes(role)) {
-    //   return res.status(400).json({
-    //     ok: false,
-    //     message: 'Invalid role. Must be one of: patient, doctor, hospital'
-    //   });
-    // }
+    const validRoles = ["patient", "doctor", "hospital"];
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({
+        ok: false,
+        message: "Invalid role. Must be one of: patient, doctor, hospital",
+      });
+    }
 
     // Validate password strength
     if (password.length < 6) {
       return res.status(400).json({
         ok: false,
-        message: 'Password must be at least 6 characters long'
+        message: "Password must be at least 6 characters long",
       });
     }
 
     const result = await AuthService.register(
       { email, password },
-      // entityData,
-      // role,
+      entityData,
+      role,
       blockchainHash
     );
 
     res.status(201).json({
       ok: true,
-      message: 'User registered successfully',
-      data: result
+      message: "User registered successfully",
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -61,7 +62,7 @@ export const login = async (req, res, next) => {
     if (!email || !password) {
       return res.status(400).json({
         ok: false,
-        message: 'Email and password are required'
+        message: "Email and password are required",
       });
     }
 
@@ -69,8 +70,8 @@ export const login = async (req, res, next) => {
 
     res.json({
       ok: true,
-      message: 'Login successful',
-      data: result
+      message: "Login successful",
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -84,7 +85,7 @@ export const getProfile = async (req, res, next) => {
 
     res.json({
       ok: true,
-      data: user
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -100,8 +101,8 @@ export const updateProfile = async (req, res, next) => {
 
     res.json({
       ok: true,
-      message: 'Profile updated successfully',
-      data: user
+      message: "Profile updated successfully",
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -117,7 +118,7 @@ export const changePassword = async (req, res, next) => {
     if (!currentPassword || !newPassword) {
       return res.status(400).json({
         ok: false,
-        message: 'Current password and new password are required'
+        message: "Current password and new password are required",
       });
     }
 
@@ -125,7 +126,7 @@ export const changePassword = async (req, res, next) => {
     if (newPassword.length < 6) {
       return res.status(400).json({
         ok: false,
-        message: 'New password must be at least 6 characters long'
+        message: "New password must be at least 6 characters long",
       });
     }
 
@@ -133,7 +134,7 @@ export const changePassword = async (req, res, next) => {
 
     res.json({
       ok: true,
-      message: 'Password changed successfully'
+      message: "Password changed successfully",
     });
   } catch (error) {
     next(error);
@@ -148,7 +149,7 @@ export const forgotPassword = async (req, res, next) => {
     if (!email) {
       return res.status(400).json({
         ok: false,
-        message: 'Email is required'
+        message: "Email is required",
       });
     }
 
@@ -156,8 +157,8 @@ export const forgotPassword = async (req, res, next) => {
 
     res.json({
       ok: true,
-      message: 'Password reset instructions sent to email',
-      data: result
+      message: "Password reset instructions sent to email",
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -172,7 +173,7 @@ export const resetPassword = async (req, res, next) => {
     if (!token || !newPassword) {
       return res.status(400).json({
         ok: false,
-        message: 'Token and new password are required'
+        message: "Token and new password are required",
       });
     }
 
@@ -180,7 +181,7 @@ export const resetPassword = async (req, res, next) => {
     if (newPassword.length < 6) {
       return res.status(400).json({
         ok: false,
-        message: 'New password must be at least 6 characters long'
+        message: "New password must be at least 6 characters long",
       });
     }
 
@@ -188,7 +189,7 @@ export const resetPassword = async (req, res, next) => {
 
     res.json({
       ok: true,
-      message: 'Password reset successfully'
+      message: "Password reset successfully",
     });
   } catch (error) {
     next(error);
@@ -202,7 +203,7 @@ export const refreshToken = async (req, res, next) => {
 
     res.json({
       ok: true,
-      data: result
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -216,7 +217,7 @@ export const logout = async (req, res, next) => {
 
     res.json({
       ok: true,
-      message: 'Logged out successfully'
+      message: "Logged out successfully",
     });
   } catch (error) {
     next(error);
@@ -231,7 +232,7 @@ export const getUserByWallet = async (req, res, next) => {
     if (!walletAddress) {
       return res.status(400).json({
         ok: false,
-        message: 'Wallet address is required'
+        message: "Wallet address is required",
       });
     }
 
@@ -239,7 +240,7 @@ export const getUserByWallet = async (req, res, next) => {
 
     res.json({
       ok: true,
-      data: user
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -249,13 +250,13 @@ export const getUserByWallet = async (req, res, next) => {
 // Verify token (for client-side token validation)
 export const verifyToken = async (req, res, next) => {
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
 
     if (!token) {
       return res.status(401).json({
         ok: false,
-        message: 'Token is required'
+        message: "Token is required",
       });
     }
 
@@ -266,16 +267,383 @@ export const verifyToken = async (req, res, next) => {
       ok: true,
       data: {
         valid: true,
-        user
-      }
+        user,
+      },
     });
   } catch (error) {
     res.status(401).json({
       ok: false,
-      message: 'Invalid or expired token',
+      message: "Invalid or expired token",
       data: {
-        valid: false
+        valid: false,
+      },
+    });
+  }
+};
+
+// Chat - Handle patient message and update chat room
+// export const handlePatientMessage = async (req, res, next) => {
+//   try {
+//     const { patientId, inputtext } = req.body;
+
+//     if (!patientId || !inputtext) {
+//       return res.status(400).json({ ok: false, message: 'patientId and inputtext are required' });
+//     }
+
+//     // Step 1: Find or create the chat room
+//     let chatRoom = await ChatRoom.findOne({ patient: patientId });
+
+//     if (!chatRoom) {
+//       chatRoom = new ChatRoom({
+//         patient: patientId,
+//         conversation: []
+//       });
+//     }
+
+//     // Step 2: Add new inputtext
+//     const newMessage = {
+//       inputtext,
+//       timestamp: new Date()
+//     };
+//     chatRoom.conversation.push(newMessage);
+
+//     // // Step 3: Call third-party API
+//     // const response = await axios.post('https://third-party-api.com/process', {
+//     //   conversation: chatRoom.conversation
+//     // });
+
+//     const response = {
+//       data: {
+//         outputtext: "Hello Welcome HelathSync.io",
+//         summary: "This is Summary"
+//       }
+//     }
+
+//     // const { outputtext, summary } = response.data;
+//     const { outputtext, summary } = response.data;
+
+//     // Step 4: Update outputtext and summary
+//     const lastIndex = chatRoom.conversation.length - 1;
+//     chatRoom.conversation[lastIndex].outputtext = outputtext;
+//     chatRoom.summary = summary;
+
+//     // Step 5: Save updated chat room
+//     await chatRoom.save();
+
+//     // Step 6: Send response
+//     res.json({
+//       ok: true,
+//       message: 'Chat updated successfully',
+//       data: {
+//         summary: chatRoom.summary,
+//         conversation: chatRoom.conversation
+//       }
+//     });
+
+//   } catch (error) {
+//     next(error); // Use centralized error handler
+//   }
+// };
+
+// Handle patient message and update chat room
+export const handlePatientMessage = async (req, res, next) => {
+  try {
+    const { patientId, inputtext } = req.body;
+
+    if (!patientId || !inputtext) {
+      return res
+        .status(400)
+        .json({ ok: false, message: "patientId and inputtext are required" });
+    }
+    // ✅ Step 0: Check if patient exists
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({ ok: false, message: "Patient not found" });
+    }
+
+    // Step 1: Find or create the chat room
+    let chatRoom = await ChatRoom.findOne({ patient: patientId });
+
+    if (!chatRoom) {
+      chatRoom = new ChatRoom({
+        patient: patientId,
+        conversation: [],
+        summary: "",
+        patientDetails: {}, // Initialize empty
+      });
+    }
+
+    // Step 2: Push patient's message to conversation
+    const newMessage = {
+      inputtext,
+      timestamp: new Date(),
+    };
+    chatRoom.conversation.push(newMessage);
+
+    // Step 3: Format conversation as chat_history for third-party API
+    const chatHistory = chatRoom.conversation.flatMap((msg) => {
+      const history = [];
+      if (msg.inputtext) {
+        history.push({ role: "user", content: msg.inputtext });
       }
+      if (msg.outputtext) {
+        history.push({ role: "assistant", content: msg.outputtext });
+      }
+      return history;
+    });
+
+    const payload = {
+      chat_history: chatHistory,
+      asked_for_pid: true,
+      patient_state: {
+        assistant_reply:
+          chatRoom.conversation[chatRoom.conversation.length - 2]?.outputtext ||
+          "",
+        conversationSummary: chatRoom.summary || "",
+        patientDetails: { ...chatRoom.patientDetails, pid: patientId } || {},
+      },
+    };
+    console.log("PAYLOAD", payload);
+
+    // Step 4: Call third-party chatbot API
+    const apiResponse = await axios.post(
+      "https://webashalarforml-patient-bot.hf.space/chat",
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
+      }
+    );
+    console.log("apiResponse.data", apiResponse.data);
+    const { assistant_reply, updated_state } = apiResponse.data;
+
+    // Step 5: Update last message with outputtext
+    const lastIndex = chatRoom.conversation.length - 1;
+    chatRoom.conversation[lastIndex].outputtext = assistant_reply;
+
+    // Step 6: Update summary
+    // ✅ Step 6: Update summary and patientDetails in DB
+    if (updated_state.conversationSummary) {
+      chatRoom.summary = updated_state.conversationSummary;
+    }
+    if (updated_state.patientDetails) {
+      chatRoom.patientDetails = updated_state.patientDetails;
+    }
+
+    // Optional: Save patientDetails somewhere if needed
+
+    // Step 7: Save updated chat room
+    await chatRoom.save();
+
+    // Step 8: Respond with updated data
+    res.json({
+      ok: true,
+      message: "Chat updated successfully",
+      data: {
+        summary: chatRoom.summary,
+        conversation: chatRoom.conversation,
+        patientDetails: chatRoom.patientDetails,
+      },
+    });
+  } catch (error) {
+    console.error("Error in chat handler:", error.message);
+    next(error);
+  }
+};
+
+// Get current user chat history
+export const getChatHistory = async (req, res, next) => {
+  try {
+    const { patientId } = req.params;
+
+    if (!patientId) {
+      return res
+        .status(400)
+        .json({ ok: false, message: "patientId is required" });
+    }
+
+    const chatRoom = await ChatRoom.findOne({ patient: patientId }).lean();
+
+    if (!chatRoom) {
+      return res
+        .status(404)
+        .json({ ok: false, message: "No chat history found for this patient" });
+    }
+
+    res.json({
+      ok: true,
+      message: "Chat history retrieved successfully",
+      data: {
+        summary: chatRoom.summary || "",
+        conversation: chatRoom.conversation || [],
+        patientDetails: chatRoom.patientDetails || {},
+      },
+    });
+  } catch (error) {
+    console.error("Get Chat History Error:", error.message);
+    next(error);
+  }
+};
+
+// export const reportAnalyseData = async (req, res, next) => {
+//   try {
+//     const { patientId, fromDate, toDate } = req.body;
+
+//     // Fetch reports within date range
+//     const reports = await Report.find({
+//       patient: patientId,
+//       reportDate: {
+//         $gte: new Date(fromDate),
+//         $lte: new Date(toDate)
+//       },
+//       reportFileName: { $ne: null }
+//     });
+
+//     if (reports.length === 0) {
+//       return res.status(404).json({ message: "No reports found." });
+//     }
+
+//     // Extract file names from URLs
+//     const fileNames = reports.map(r => {
+//       if (r.reportFileName) {
+//         return r.reportFileName // Get "CBC.pdf" from URL
+//       }
+//     }).filter(Boolean);
+
+//     console.log("fileNames", fileNames)
+//     const payload = {
+//       patient_id: patientId, // Or a mapped patient code like "p_1234"
+//       filenames: fileNames
+//     };
+//     console.log("payload", payload)
+
+//     // Call external API
+//     const response = await axios.post(
+//       'https://webashalarforml-health-dac-assist.hf.space/process_reports',
+//       payload,
+//       {
+//         headers: {
+//           'accept': '*/*',
+//           'content-type': 'application/json',
+//           'origin': 'https://webashalarforml-health-dac-assist.hf.space',
+//           'referer': 'https://webashalarforml-health-dac-assist.hf.space/',
+//           'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36'
+//         }
+//       }
+//     );
+
+//     // Step 4: Call third-party chatbot API
+//     // const apiResponse = await axios.post('https://webashalarforml-patient-bot.hf.space/chat', payload, {
+//     //   headers: {
+//     //     'Content-Type': 'application/json',
+//     //     'Accept': '*/*'
+//     //   }
+//     // });
+//     console.log("-----------response----------", response)
+//     return res.status(200).json({
+//       success: true,
+//       reportNames: fileNames,
+//       data: response.data
+//     });
+
+//   } catch (error) {
+//     console.error("Analysis API Error:", error.message);
+//     return res.status(500).json({
+//       message: error.message,
+//       stack: error.stack
+//     });
+//   }
+// };
+
+import path from "path";
+
+export const reportAnalyseData = async (req, res, next) => {
+  try {
+    const { patientId, fromDate, toDate } = req.body;
+
+    // // Fetch reports within date range
+    // const reports = await Report.find({
+    //   patient: patientId,
+    //   reportDate: {
+    //     $gte: new Date(fromDate),
+    //     $lte: new Date(toDate),
+    //   },
+    //   reportFileName: { $ne: null },
+    // });
+
+    // Build query based on presence of fromDate and toDate
+    const query = {
+      patient: patientId,
+      reportFileName: { $ne: null },
+    };
+
+    if (fromDate && toDate) {
+      query.reportDate = {
+        $gte: new Date(fromDate),
+        $lte: new Date(toDate),
+      };
+    }
+
+    // Fetch reports
+    const reports = await Report.find(query);
+
+    if (reports.length === 0) {
+      return res.status(404).json({ message: "No reports found." });
+    }
+
+    // Extract just the filenames (basename) from URLs or strings
+    let fileNames = reports
+      .map((r) => {
+        if (r.reportFileName) {
+          // This will extract filename from URL or path
+          return path.basename(r.reportFileName);
+        }
+      })
+      .filter(Boolean);
+
+    // Remove duplicates
+    fileNames = [...new Set(fileNames)];
+
+    // Debug log
+    console.log("Unique fileNames sent to external API:", fileNames);
+
+    const payload = {
+      patient_id: patientId, // Or mapped patient code if needed
+      filenames: fileNames,
+    };
+
+    // Call external API
+    const response = await axios.post(
+      "https://webashalarforml-health-dac-assist.hf.space/process_reports",
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
+      }
+    );
+
+    console.log("Response from external API:", response.data);
+
+    return res.status(200).json({
+      success: true,
+      reportNames: fileNames,
+      data: response.data,
+    });
+  } catch (error) {
+    console.error("Analysis API Error:", error.message);
+
+    if (error.response) {
+      console.error("Status:", error.response.status);
+      console.error("Response Data:", error.response.data);
+    }
+
+    return res.status(500).json({
+      message: error.message,
+      stack: error.stack,
     });
   }
 };
