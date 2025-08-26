@@ -121,17 +121,19 @@ export class AuthService {
     let entityModel;
 
 
+    console.log("{ ...userData, ...entityData }", { ...userData, ...entityData, contactNumber: entityData.phone })
+
     switch (role) {
       case 'patient':
-        entity = await Patient.create({ ...userData, ...entityData });
+        entity = await Patient.create({ ...userData, ...entityData, contactNumber: entityData.phone });
         entityModel = 'Patient';
         break;
       case 'doctor':
-        entity = await Doctor.create({ ...userData, ...entityData });
+        entity = await Doctor.create({ ...userData, ...entityData, contactNumber: entityData.phone });
         entityModel = 'Doctor';
         break;
       case 'hospital':
-        entity = await Hospital.create({ ...userData, ...entityData });
+        entity = await Hospital.create({ ...userData, ...entityData, contactNumber: entityData.phone });
         entityModel = 'Hospital';
         break;
       default:
@@ -166,7 +168,7 @@ export class AuthService {
       { new: true }
     )
     console.log("Updated user:", userdata)
-    
+
     // Generate token
     const token = this.generateToken(user);
 
@@ -193,7 +195,7 @@ export class AuthService {
     if (!user) {
       throw new Error('User not found');
     }
-
+    console.log("user--------------------", user)
     // Get entity details
     let entityDetails = null;
     try {
@@ -338,48 +340,118 @@ export class AuthService {
     return this.getCurrentUser(user._id);
   }
 
-  // Update user profile
+  // Update user profile with entity update
   static async updateProfile(userId, updateData) {
+    // Allowed fields per entity model based on your schema
+    const allowedEntityFields = {
+      Patient: [
+        'fullName', 'dob', 'gender', 'bloodGroup',
+        'contactNumber', 'email', 'address',
+        'emergencyContact', 'walletAddress'
+      ],
+      Doctor: [
+        'fullName', 'specialization', 'qualification',
+        'licenseNumber', 'contactNumber', 'email',
+        'hospital', 'walletAddress', 'sbtTokenId'
+      ],
+      Hospital: [
+        'name', 'type', 'registrationNumber',
+        'contactNumber', 'email', 'address',
+        'walletAddress', 'sbtTokenId'
+      ]
+    };
     const user = await User.findById(userId);
     if (!user) {
       throw new Error('User not found');
     }
 
-    // Define allowed fields
-    const allowedUpdates = ['email'];
-    const updates = {};
+    console.log("updateData------", updateData)
+
+    // Allowed user fields to update
+    const allowedUserUpdates = ['email'];
+    const userUpdates = {};
     let profileChanged = false;
 
-    for (const field of allowedUpdates) {
+    // Update user fields
+    for (const field of allowedUserUpdates) {
       if (updateData[field] !== undefined && updateData[field] !== user[field]) {
-        updates[field] = updateData[field];
+        userUpdates[field] = updateData[field];
         profileChanged = true;
       }
     }
 
     if (profileChanged) {
-      // Apply updates
-      await User.findByIdAndUpdate(userId, updates, { new: true });
+      await User.findByIdAndUpdate(userId, userUpdates, { new: true });
+    }
 
-      // Re-fetch updated user
-      const updatedUser = await User.findById(userId);
+    // Allowed entity fields from schema
+    const allowedEntityUpdates = allowedEntityFields[user.entityModel] || [];
 
-      // Prepare data for hashing — only relevant public data
-      const hashData = {
-        email: updatedUser.email,
-        walletAddress: updatedUser.walletAddress,
-        role: updatedUser.role,
-        entityId: updatedUser.entityId.toString()
-      };
+    // Prepare entity updates from input
+    const entityUpdates = {};
+    for (const field of allowedEntityUpdates) {
+      if (updateData[field] !== undefined) {
+        entityUpdates[field] = updateData[field];
+      }
+    }
 
-      // Generate new blockchain hash
+    if (Object.keys(entityUpdates).length > 0) {
+      const EntityModel = {
+        Patient,
+        Doctor,
+        Hospital
+      }[user.entityModel];
+
+      if (!EntityModel) {
+        throw new Error('Invalid entity model');
+      }
+
+      await EntityModel.findByIdAndUpdate(user.entityId, entityUpdates, { new: true });
+    }
+
+    // Re-fetch updated user
+    const updatedUser = await User.findById(userId);
+
+    // Prepare hash data
+    const hashData = {
+      email: updatedUser.email,
+      walletAddress: updatedUser.walletAddress,
+      role: updatedUser.role,
+      entityId: updatedUser.entityId.toString(),
+    };
+
+    // Update blockchain hash if user profile changed
+    if (profileChanged) {
       const newHash = sha256OfObject(hashData);
-
-      // Update blockchainHash and add transaction
       updatedUser.blockchainHash = newHash;
       await updatedUser.addTransaction(newHash, 'Profile updated');
     }
 
+    // Return updated user + entity details
     return this.getCurrentUser(userId);
+  }
+
+  static async deleteProfile(userId) {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Delete the associated entity
+    const entityModels = { Patient, Doctor, Hospital };
+    const EntityModel = entityModels[user.entityModel];
+
+    if (EntityModel && user.entityId) {
+      await EntityModel.findByIdAndDelete(user.entityId);
+    }
+
+    // Delete the user
+    await User.findByIdAndDelete(userId);
+
+    return {
+      id: userId,
+      entityDeleted: user.entityId,
+      entityModel: user.entityModel
+    };
   }
 }

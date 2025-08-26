@@ -13,7 +13,8 @@ import {
   verifyToken,
   handlePatientMessage,
   reportAnalyseData,
-  getChatHistory
+  getChatHistory,
+  deleteProfile
 } from '../controllers/auth.controller.js';
 import { authenticateToken, requireRole } from '../middleware/auth.js';
 
@@ -29,6 +30,7 @@ r.post('/verify-token', verifyToken);
 // Protected routes (authentication required)
 r.get('/profile', authenticateToken, getProfile);
 r.put('/profile', authenticateToken, updateProfile);
+r.delete('/profile', authenticateToken, deleteProfile);
 r.post('/change-password', authenticateToken, changePassword);
 r.post('/refresh-token', authenticateToken, refreshToken);
 r.post('/logout', authenticateToken, logout);

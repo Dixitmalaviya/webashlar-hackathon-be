@@ -261,25 +261,27 @@ export const getRelationshipStats = async (req, res, next) => {
 export const getMyDoctors = async (req, res, next) => {
   try {
     const { entityId } = req.user;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
 
-    // if (req.user.role !== 'patient') {
-    //   return res.status(403).json({
-    //     ok: false,
-    //     message: 'Only patients can access this endpoint'
-    //   });
-    // }
-
-    const doctors = await RelationshipService.getPatientDoctors(entityId);
+    const { data: doctors, total } = await RelationshipService.getPatientDoctors(entityId, limit, offset);
 
     res.json({
       ok: true,
       data: doctors,
-      count: doctors.length
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
     });
   } catch (error) {
     next(error);
   }
 };
+
 
 // Get my patients (for doctors)
 export const getMyPatients = async (req, res, next) => {
@@ -293,17 +295,27 @@ export const getMyPatients = async (req, res, next) => {
       });
     }
 
-    const patients = await RelationshipService.getDoctorPatients(entityId);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const { data: patients, total } = await RelationshipService.getDoctorPatients(entityId, limit, offset);
 
     res.json({
       ok: true,
       data: patients,
-      count: patients.length
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
     });
   } catch (error) {
     next(error);
   }
 };
+
 
 // Get my patient data (for doctors)
 export const getMyPatientData = async (req, res, next) => {
