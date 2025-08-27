@@ -28,10 +28,26 @@ import FormData from "form-data";
 import fs from "fs";
 import path from "path";
 
-// multer setup (store uploaded file temporarily)
-const upload = multer({ dest: "uploads/" }); // you can configure a temp directory
-
 const r = Router();
+
+// // multer setup (store uploaded file temporarily)
+// const upload = multer({ dest: "/tmp/uploads/" }); // you can configure a temp directory
+
+// Determine multer storage
+let upload;
+try {
+  const tempDir = "/tmp/uploads";
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+  }
+
+  upload = multer({ dest: tempDir });
+  console.log("📁 Using disk storage at /tmp/uploads");
+} catch (err) {
+  console.warn("⚠️ Failed to use disk storage, falling back to memory:", err.message);
+  upload = multer({ storage: multer.memoryStorage() });
+}
+
 
 // All routes require authentication
 // r.use(authenticateToken);

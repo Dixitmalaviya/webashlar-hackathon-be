@@ -464,8 +464,26 @@ export const uploadReportFile = async (req, res, next) => {
 
     // Prepare form-data for the 3rd party API
     const form = new FormData();
+    // form.append("patient_id", patientId);
+    // form.append("files", fs.createReadStream(file.path), file.originalname);
+
+    let fileStream;
+    if (file.path) {
+      // Disk storage
+      fileStream = fs.createReadStream(file.path);
+    } else if (file.buffer) {
+      // Memory storage
+      form.append("files", file.buffer, file.originalname);
+    }
+
+    if (!fileStream && !file.buffer) {
+      return res.status(400).json({ ok: false, message: "Invalid file upload" });
+    }
+
     form.append("patient_id", patientId);
-    form.append("files", fs.createReadStream(file.path), file.originalname);
+    if (fileStream) {
+      form.append("files", fileStream, file.originalname);
+    }
 
     // Send to external API
     const uploadResponse = await axios.post(
