@@ -8,7 +8,7 @@ import Report from "../models/Report.js";
 // Register new user
 export const register = async (req, res, next) => {
   try {
-    const { email, password, doctor, hospital, role = 'patient', ...entityData } = req.body;
+    const { email, password, doctor, hospital, role = 'patient', bloodGroup, gender, ...entityData } = req.body;
     const blockchainHash = sha256OfObject({ ...req.body });
 
     // Validate required fields
@@ -36,7 +36,7 @@ export const register = async (req, res, next) => {
     }
     console.log("req.body-----=-=--=--=-=-==-=-=-", req.body, doctor, hospital)
     const result = await AuthService.register(
-      { email, password },
+      { email, password, bloodGroup, gender },
       entityData,
       role,
       blockchainHash,

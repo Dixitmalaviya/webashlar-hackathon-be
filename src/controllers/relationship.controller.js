@@ -1,6 +1,7 @@
 import { RelationshipService } from '../services/relationship.service.js';
 import Relationship from '../models/Relationship.js';
 import mongoose from 'mongoose';
+import Doctor from '../models/Doctor.js';
 
 // Create a new patient-doctor relationship
 export const createRelationship = async (req, res, next) => {
@@ -300,7 +301,7 @@ export const getMyPatients = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
-    const { data: patients, total } = await RelationshipService.getDoctorPatients(entityId, limit, offset).sort({ "createdAt": -1 });
+    const { data: patients, total } = await RelationshipService.getDoctorPatients(entityId, limit, offset)
 
     res.json({
       ok: true,
@@ -421,14 +422,19 @@ export const getHospitalDoctors = async (req, res, next) => {
     const { hospitalId } = req.params;
 
     // Find distinct doctor IDs for the hospital
-    const doctorIds = await Relationship.find({
-      hospital: hospitalId,
-      isActive: true
-    }).distinct('doctor');
+    // const doctorIds = await Relationship.find({
+    //   hospital: hospitalId,
+    //   isActive: true
+    // }).distinct('doctor');
+    // console.log('doctorIds', doctorIds)
 
     // Fetch doctor info for those IDs
-    const doctors = await mongoose.model('Doctor').find({
-      _id: { $in: doctorIds }
+    // const doctors = await mongoose.model('Doctor').find({
+    //   _id: { $in: doctorIds }
+    // }).select('fullName email');
+
+    const doctors = await Doctor.find({
+      hospital: hospitalId,
     }).select('fullName email');
 
     res.json({

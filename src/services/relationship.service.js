@@ -131,13 +131,13 @@ export class RelationshipService {
         .populate([
           {
             path: 'patient',
-            select: 'fullName dob phone email address emergencyContact'
+            select: 'fullName dob phone email address emergencyContact bloodGroup gender'
           },
           {
             path: 'hospital',
             select: 'name address phone type'
           }
-        ]),
+        ]).sort({ "createdAt": -1 }),
       Relationship.countDocuments({
         doctor: doctorId,
         isActive: true

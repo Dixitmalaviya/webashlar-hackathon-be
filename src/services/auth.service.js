@@ -123,10 +123,18 @@ export class AuthService {
     let entityModel;
 
     switch (role) {
-      case 'patient':
-        entity = await Patient.create({ ...userData, ...entityData, contactNumber: entityData.phone });
+      case 'patient': {
+        // Generate a random 16-digit card number as a string
+        const cardNumber = Array.from({ length: 16 }, () => Math.floor(Math.random() * 10)).join('');
+        entity = await Patient.create({
+          ...userData,
+          ...entityData,
+          contactNumber: entityData.phone,
+          cardNumber
+        });
         entityModel = 'Patient';
         break;
+      }
       case 'doctor':
         entity = await Doctor.create({ ...userData, ...entityData, contactNumber: entityData.phone, hospital });
         entityModel = 'Doctor';
@@ -214,7 +222,7 @@ export class AuthService {
     return {
       token,
       user: {
-        id: user._id,
+        _id: user._id,
         email: user.email,
         role: user.role,
         // walletAddress: user.walletAddress,
