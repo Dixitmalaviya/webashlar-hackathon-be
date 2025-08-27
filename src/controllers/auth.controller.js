@@ -535,14 +535,14 @@ export const getChatHistory = async (req, res, next) => {
 
 //     // Call external API
 //     const response = await axios.post(
-//       'https://webashalarforml-health-dac-assist.hf.space/process_reports',
+//       'https://webashalarforml-health-doc.hf.space/process_reports',
 //       payload,
 //       {
 //         headers: {
 //           'accept': '*/*',
 //           'content-type': 'application/json',
-//           'origin': 'https://webashalarforml-health-dac-assist.hf.space',
-//           'referer': 'https://webashalarforml-health-dac-assist.hf.space/',
+//           'origin': 'https://webashalarforml-health-doc.hf.space',
+//           'referer': 'https://webashalarforml-health-doc.hf.space/',
 //           'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36'
 //         }
 //       }
@@ -630,7 +630,7 @@ export const reportAnalyseData = async (req, res, next) => {
 
     // Call external API
     const response = await axios.post(
-      "https://webashalarforml-health-dac-assist.hf.space/process_reports",
+      "https://webashalarforml-health-doc.hf.space/process_reports",
       payload,
       {
         headers: {
